@@ -1,0 +1,67 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+additionalProperties: false
+required: [manifests, output_root, reference, vep, outputs, temporary_directory, resources, logging]
+properties:
+  manifests:
+    type: object
+    additionalProperties: false
+    required: [source, vcf_key, index_key]
+    properties:
+      source: {type: string, minLength: 1}
+      vcf_key: {type: string, minLength: 1}
+      index_key: {type: string, minLength: 1}
+  output_root: {type: string, minLength: 1}
+  reference:
+    type: object
+    additionalProperties: false
+    required: [assembly, fasta, fai, dictionary]
+    properties:
+      assembly: {enum: [GRCh38]}
+      fasta: {type: string}
+      fai: {type: string}
+      dictionary: {type: string}
+  vep:
+    type: object
+    additionalProperties: false
+    required: [cache_directory, cache_version, species, assembly, annotation_format, forks, offline, transcript_set, include_mane, include_canonical, include_tsl, retain_all_transcript_consequences]
+    properties:
+      cache_directory: {type: string}
+      cache_version: {type: integer, minimum: 100}
+      species: {const: homo_sapiens}
+      assembly: {const: GRCh38}
+      annotation_format: {enum: [vep_cache]}
+      forks: {type: integer, minimum: 1}
+      offline: {type: boolean}
+      transcript_set: {enum: [ensembl, refseq, merged]}
+      include_mane: {type: boolean}
+      include_canonical: {type: boolean}
+      include_tsl: {type: boolean}
+      retain_all_transcript_consequences: {const: true}
+  outputs:
+    type: object
+    additionalProperties: false
+    required: [vep_vcf, vep_tabular]
+    properties:
+      vep_vcf: {const: true}
+      vep_tabular: {const: true}
+  temporary_directory: {type: string}
+  resources:
+    type: object
+    required: [normalize, vep, python, reporting]
+    additionalProperties: false
+    patternProperties:
+      "^(normalize|vep|python|reporting)$":
+        type: object
+        additionalProperties: false
+        required: [threads, mem_mb, runtime]
+        properties:
+          threads: {type: integer, minimum: 1}
+          mem_mb: {type: integer, minimum: 256}
+          runtime: {type: integer, minimum: 1}
+  logging:
+    type: object
+    additionalProperties: false
+    required: [verbosity]
+    properties:
+      verbosity: {enum: [DEBUG, INFO, WARNING, ERROR]}

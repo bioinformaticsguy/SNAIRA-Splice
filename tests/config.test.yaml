@@ -1,0 +1,31 @@
+manifests:
+  source: tests/manifests
+  vcf_key: outputs.snv_pass_vcf
+  index_key: outputs.snv_pass_vcf_index
+output_root: tests/work/results
+reference:
+  assembly: GRCh38
+  fasta: tests/data/GRCh38.mini.fa
+  fai: tests/data/GRCh38.mini.fa.fai
+  dictionary: tests/data/GRCh38.mini.dict
+vep:
+  cache_directory: tests/data/fake_vep_cache
+  cache_version: 113
+  species: homo_sapiens
+  assembly: GRCh38
+  annotation_format: vep_cache
+  forks: 1
+  offline: true
+  transcript_set: ensembl
+  include_mane: true
+  include_canonical: true
+  include_tsl: true
+  retain_all_transcript_consequences: true
+outputs: {vep_vcf: true, vep_tabular: true}
+temporary_directory: tests/work/tmp
+resources:
+  normalize: {threads: 1, mem_mb: 512, runtime: 5}
+  vep: {threads: 1, mem_mb: 1024, runtime: 5}
+  python: {threads: 1, mem_mb: 512, runtime: 5}
+  reporting: {threads: 1, mem_mb: 512, runtime: 5}
+logging: {verbosity: INFO}

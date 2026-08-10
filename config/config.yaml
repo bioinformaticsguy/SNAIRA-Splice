@@ -1,0 +1,34 @@
+manifests:
+  source: config/manifests.example.txt
+  vcf_key: outputs.snv_pass_vcf
+  index_key: outputs.snv_pass_vcf_index
+output_root: results
+reference:
+  assembly: GRCh38
+  fasta: resources/reference/GRCh38.fa
+  fai: resources/reference/GRCh38.fa.fai
+  dictionary: resources/reference/GRCh38.dict
+vep:
+  cache_directory: resources/vep
+  cache_version: 113
+  species: homo_sapiens
+  assembly: GRCh38
+  annotation_format: vep_cache
+  forks: 4
+  offline: true
+  transcript_set: ensembl
+  include_mane: true
+  include_canonical: true
+  include_tsl: true
+  retain_all_transcript_consequences: true
+outputs:
+  vep_vcf: true
+  vep_tabular: true
+temporary_directory: .snakemake/tmp
+resources:
+  normalize: {threads: 2, mem_mb: 4096, runtime: 60}
+  vep: {threads: 4, mem_mb: 16384, runtime: 480}
+  python: {threads: 1, mem_mb: 4096, runtime: 60}
+  reporting: {threads: 1, mem_mb: 2048, runtime: 30}
+logging:
+  verbosity: INFO

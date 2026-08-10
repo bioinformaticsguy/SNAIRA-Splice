@@ -1,0 +1,5 @@
+##fileformat=VCFv4.2
+##contig=<ID=chr21,length=100>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SYNTHETIC-1
+chr21	20	.	A	G	60	PASS	.	GT	0/1

@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use SNAIRA-Splice, please cite this software."
+title: "SNAIRA-Splice"
+type: software
+version: 0.1.0
+date-released: 2026-07-21
+license: MIT
+authors:
+  - family-names: "The Splicing Gap contributors"
+repository-code: "https://example.org/the-splicing-gap/SNAIRA-Splice"

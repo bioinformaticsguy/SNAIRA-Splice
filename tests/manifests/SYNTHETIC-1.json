@@ -1,0 +1,15 @@
+{
+  "family_id": "SYNTHETIC",
+  "manifest_version": "1.0",
+  "outputs": {
+    "snv_pass_vcf": "../data/SYNTHETIC-1.vcf.gz",
+    "snv_pass_vcf_index": "../data/SYNTHETIC-1.vcf.gz.tbi"
+  },
+  "path_base": "manifest_directory",
+  "pipeline_name": "synthetic-test",
+  "pipeline_phase": "test",
+  "reference": "GRCh38",
+  "role": "proband",
+  "sample_id": "SYNTHETIC-1",
+  "sex": "NA"
+}

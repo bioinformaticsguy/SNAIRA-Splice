@@ -1,0 +1,13 @@
+.snakemake/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+results/
+tests/work/
+resources/reference/
+resources/vep/
+resources/software/
+resources/resource_manifest.*
+!resources/.gitkeep
+!resources/README.md

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["manifest_version", "sample_id", "outputs", "reference"],
+  "properties": {
+    "manifest_version": {"const": "1.0"},
+    "sample_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"},
+    "family_id": {"type": "string"},
+    "path_base": {"enum": ["manifest_directory", "output_directory", "absolute"]},
+    "output_directory": {"type": "string"},
+    "reference": {"type": "string"},
+    "outputs": {"type": "object", "required": ["snv_pass_vcf"]}
+  }
+}

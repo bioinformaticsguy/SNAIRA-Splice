@@ -1,0 +1,7 @@
+cores: 4
+use-conda: true
+conda-frontend: conda
+printshellcmds: true
+show-failed-logs: true
+rerun-incomplete: true
+latency-wait: 30

@@ -1,0 +1,33 @@
+rule all:
+    input: "tests/work/e2e/summary.json"
+
+rule mock_vep_gzip:
+    input: "tests/data/mock.vep.tsv"
+    output: "tests/work/e2e/mock.vep.tsv.gz"
+    shell: "gzip -c {input} > {output}"
+
+rule extract:
+    input: "tests/work/e2e/mock.vep.tsv.gz"
+    output:
+        canonical="tests/work/e2e/canonical.tsv.gz",
+        region="tests/work/e2e/region.tsv.gz"
+    shell:
+        "python3 workflow/scripts/extract_vep_annotations.py --input {input} --canonical {output.canonical} "
+        "--noncanonical {output.region} --sample-id SYNTHETIC-1 --source-vcf synthetic.vcf.gz "
+        "--source-manifest synthetic.json --annotation-version 113"
+
+rule collapse:
+    input: "tests/work/e2e/canonical.tsv.gz"
+    output: "tests/work/e2e/variants.tsv.gz"
+    shell: "python3 workflow/scripts/collapse_canonical_variants.py --input {input} --output {output}"
+
+rule summary:
+    input:
+        variants="tests/work/e2e/variants.tsv.gz",
+        transcripts="tests/work/e2e/canonical.tsv.gz",
+        regions="tests/work/e2e/region.tsv.gz"
+    output:
+        tsv="tests/work/e2e/summary.tsv", json="tests/work/e2e/summary.json", html="tests/work/e2e/summary.html"
+    shell:
+        "python3 workflow/scripts/summarize_results.py --variants {input.variants} --transcripts {input.transcripts} "
+        "--regions {input.regions} --label synthetic --tsv {output.tsv} --json {output.json} --html {output.html}"

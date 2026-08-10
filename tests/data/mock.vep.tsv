@@ -1,0 +1,4 @@
+## ENSEMBL VARIANT EFFECT PREDICTOR mock CI annotation
+Uploaded_variation	Location	Allele	Gene	Feature	Feature_type	Consequence	IMPACT	SYMBOL	BIOTYPE	EXON	INTRON	HGVSc	Existing_variation	STRAND	CANONICAL	MANE_SELECT	MANE_PLUS_CLINICAL	TSL	APPRIS	REF_ALLELE
+chr21_20_A/G	chr21:20	G	ENSG0001	ENST0001	Transcript	splice_donor_variant&intron_variant	HIGH	MOCK1	protein_coding		1/2	ENST0001:c.10+1A>G	rsMock	1	YES	NM_000001.1		1	principal1	A
+chr21_30_A/T	chr21:30	T	ENSG0002	ENST0002	Transcript	missense_variant&splice_region_variant	MODERATE	MOCK2	protein_coding	2/3		ENST0002:c.30A>T		-1				2	alternative1	A

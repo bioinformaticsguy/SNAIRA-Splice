@@ -1,0 +1,20 @@
+executor: slurm
+jobs: 100
+use-conda: true
+conda-frontend: conda
+printshellcmds: true
+show-failed-logs: true
+rerun-incomplete: true
+latency-wait: 60
+default-resources:
+  - mem_mb=2048
+  - runtime=60
+  - slurm_account='""'
+  - slurm_partition='""'
+set-resources:
+  normalize_vcf:
+    mem_mb: 4096
+    runtime: 60
+  vep_annotate:
+    mem_mb: 16384
+    runtime: 480
