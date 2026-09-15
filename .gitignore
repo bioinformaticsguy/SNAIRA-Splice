@@ -9,5 +9,8 @@ resources/reference/
 resources/vep/
 resources/software/
 resources/resource_manifest.*
+logs/
+insp/
+scripts/slurm/submit_snaira_splice_controller.local.sh
 !resources/.gitkeep
 !resources/README.md

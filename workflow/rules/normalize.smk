@@ -21,6 +21,7 @@ rule normalize_vcf:
     shell:
         "mkdir -p {params.temp:q} && "
         "bcftools norm --threads {threads} --multiallelics -any --fasta-ref {input.reference:q} "
-        "--check-ref e --output-type z --output {output.vcf:q} {input.vcf:q} > {log:q} 2>&1 && "
+        "--check-ref e --output-type u {input.vcf:q} 2> {log:q} | "
+        "bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' --output-type z --output {output.vcf:q} >> {log:q} 2>&1 && "
         "tabix --preset vcf {output.vcf:q} >> {log:q} 2>&1 && "
         "bcftools stats {output.vcf:q} > {output.stats:q} 2>> {log:q}"

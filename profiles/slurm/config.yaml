@@ -1,16 +1,23 @@
+# Optional cluster profile. Requires snakemake-executor-plugin-slurm in the
+# controller environment. Site-specific values are supplied by the local
+# launcher in scripts/slurm rather than committed here.
 executor: slurm
-jobs: 100
+jobs: 40
+local-cores: 1
+max-jobs-per-second: 2
+max-status-checks-per-second: 1
 use-conda: true
 conda-frontend: conda
 printshellcmds: true
 show-failed-logs: true
 rerun-incomplete: true
+retries: 2
 latency-wait: 60
+slurm-logdir: logs/slurm
+slurm-delete-logfiles-older-than: 14
 default-resources:
-  - mem_mb=2048
-  - runtime=60
-  - slurm_account='""'
-  - slurm_partition='""'
+  mem_mb: 2048
+  runtime: 60
 set-resources:
   normalize_vcf:
     mem_mb: 4096
@@ -18,3 +25,12 @@ set-resources:
   vep_annotate:
     mem_mb: 16384
     runtime: 480
+  spliceai_predict:
+    mem_mb: 16384
+    runtime: 720
+  build_splice_candidates:
+    mem_mb: 4096
+    runtime: 60
+  standalone_splice_report:
+    mem_mb: 2048
+    runtime: 30

@@ -1,14 +1,20 @@
 # SNAIRA-Splice
 
-SNAIRA-Splice is the first annotation component of **The Splicing Gap**, a future variant-prioritization framework. This release provides reproducible consequence annotation; it is not a clinical classifier and does not estimate the magnitude of a splice effect.
+SNAIRA-Splice is a standalone research workflow for finding splice-relevant SNVs and small indels. It normalizes a VCF, annotates transcript consequences with Ensembl VEP, runs SpliceAI locally, and combines both evidence types in machine-readable tables and a portable, variant-centric HTML report.
 
-Development toward the VIPER-integrated SQ2 prototype is tracked in [`TODO.md`](TODO.md).
+Development is tracked in [`TODO.md`](TODO.md). VIPER and CALIGO integration are explicitly outside the current MVP.
+The frozen SQ2 category definitions and VIPER exchange contract are documented in
+[`docs/splice-category-specification-v1.0.md`](docs/splice-category-specification-v1.0.md).
 
 ## Scope and scientific definition
 
-A normalized allele is a canonical splice candidate when VEP assigns at least one transcript the Sequence Ontology term `splice_donor_variant` or `splice_acceptor_variant`. Terms joined with `&` are parsed individually. `splice_region_variant` is broader and is **not** canonical here; those rows are retained separately for a future near-splice module. VEP answers whether an allele overlaps an annotated consequence. A predictor such as SpliceAI would answer how strongly an allele may change splicing; no such score is fabricated by this release.
+A normalized allele is a canonical splice candidate when VEP assigns at least one transcript the Sequence Ontology term `splice_donor_variant` or `splice_acceptor_variant`. Terms joined with `&` are parsed individually. `splice_region_variant` is broader and is **not** canonical. VEP tells us where a variant lies and its transcript consequence; SpliceAI predicts whether the DNA change may alter donor or acceptor use. A SpliceAI prediction does **not** demonstrate that an abnormal RNA transcript occurs.
 
-The workflow reads JSON manifests, validates inputs, normalizes small variants with bcftools, runs offline Ensembl VEP, extracts transcript rows, deterministically collapses canonical rows by allele, and creates sample/cohort summaries and provenance. Structural variants are out of scope.
+The main candidate set is deliberately inclusive: VEP donor, acceptor, or splice-region consequences are retained regardless of SpliceAI, and any other supported allele is retained when `SpliceAI_max >= 0.20` by default. A review table starts at `0.05`. Missing predictions remain missing and are never converted to zero. Structural variants are out of scope.
+
+## Quick start
+
+Required biological inputs are a small-variant VCF, sample ID, matching GRCh38 FASTA, Ensembl VEP cache, SpliceAI installation/models, and a GRCh38 SpliceAI gene annotation. Create the development environment, then install the large resources explicitly:
 
 ## Layout
 
@@ -36,10 +42,23 @@ bash scripts/setup_resources.sh \
   --vep-cache-version 113 \
   --species homo_sapiens \
   --download-reference \
-  --download-vep-cache
+  --download-vep-cache \
+  --install-spliceai
 ```
 
-The ordinary workflow never downloads large data. The restartable setup command downloads to a temporary directory, validates archive structure, builds FASTA indexes/dictionary, records SHA-256 checksums and versions, and creates completion markers last. `--force` replaces a requested installed resource. VEP itself is pinned in `workflow/envs/vep.yaml`; `--install-software` is available if a separately materialized VEP environment is desired. No root or system installation is used.
+Set `reference.*`, `vep.cache_dir`, and `spliceai.annotation` in `config/config.yaml`. To run one sample without writing a manifest yourself:
+
+```bash
+python scripts/run_snaira_splice.py \
+  --vcf /absolute/path/sample.vcf.gz \
+  --sample-id S001 \
+  --outdir results \
+  --config config/config.yaml
+```
+
+The final report is `results/S001/05_report/S001.snaira_splice.html`. Use `--dry-run` to inspect the DAG. Existing multi-sample manifest execution remains supported below.
+
+The ordinary workflow never downloads large data. The restartable setup command downloads to a temporary directory, validates archive structure, builds FASTA indexes/dictionary, records SHA-256 checksums and versions, and creates completion markers last. `--force` replaces a requested installed resource. VEP and SpliceAI are pinned in focused rule environments. `--install-software` and `--install-spliceai` can materialize those environments under the resource directory. No root or system installation is used. SpliceAI 1.3.1 has non-commercial use restrictions and its upstream repository is archived; review its license before use. See [docs/spliceai.md](docs/spliceai.md).
 
 Update `config/config.yaml` after setup. The default VEP release is 113 and the default transcript source is Ensembl. `refseq` and `merged` select VEP's corresponding modes. MANE, canonical, TSL, and APPRIS annotations are configurable. Both annotated VCF and transcript-oriented TSV are required in this milestone to preserve traceability.
 
@@ -55,6 +74,8 @@ Validation rejects missing required fields, unsupported versions, unsafe/path-co
 
 ## Running
 
+Local execution is the normal development path and is appropriate for a laptop:
+
 ```bash
 snakemake \
   --profile profiles/local \
@@ -64,19 +85,37 @@ snakemake \
 snakemake \
   --profile profiles/local \
   --configfile config/config.yaml
+```
 
+SLURM is an optional deployment mode. A direct profile invocation is supported:
+
+```bash
 snakemake \
   --profile profiles/slurm \
   --configfile config/config.yaml
 ```
 
-The SLURM profile uses `snakemake-executor-plugin-slurm`, pinned with Snakemake 8 in the development environment. Supply site-specific account/partition defaults on the command line or in a copied profile. Threads, memory (MB), and runtime (minutes) are configurable per stage.
+For unattended cluster runs, use the documented controller submission model, which keeps site-specific account, partition, email, and installation paths out of Git:
+
+```bash
+cp scripts/slurm/submit_snaira_splice_controller.local.example.sh \
+  scripts/slurm/submit_snaira_splice_controller.local.sh
+
+bash scripts/slurm/check_slurm_profile.sh config/config.yaml
+
+bash scripts/slurm/submit_snaira_splice_controller.local.sh \
+  --configfile config/config.yaml
+```
+
+See [docs/slurm.md](docs/slurm.md) for setup, logs, monitoring, shared Conda environments, and safe restart guidance.
+
+The SLURM profile uses `snakemake-executor-plugin-slurm`, pinned with Snakemake 8 in the development environment. The controller launcher supplies site-specific values without modifying the versioned profile. Threads, memory (MB), and runtime (minutes) remain configurable per stage.
 
 Normalization uses `bcftools norm -m -any -f ... --check-ref e`: multialleles are split, indels left-aligned, and REF mismatches stop the job. Nothing is discarded or changed at source. All derived data, indexes, logs, and benchmarks are under `output_root`.
 
 ## Outputs
 
-Each sample receives normalized VCF, raw VEP VCF/TSV and VEP HTML, canonical transcript and allele tables, a non-canonical splice-region table, and TSV/JSON/HTML summaries. `results/cohort/canonical_splice_variants.tsv.gz` concatenates allele-level candidates. `results/metadata/` contains resolved samples, manifest validation, and provenance including software/cache versions and SHA-256 checksums. See [docs/outputs.md](docs/outputs.md).
+Each sample retains normalized VCF, raw VEP outputs, a SpliceAI-annotated VCF, full parsed evidence, joined transcript candidates, collapsed allele candidates, a broader review table, and `{sample}.snaira_splice.html`. Legacy canonical-only tables and cohort summaries remain for compatibility. See [docs/outputs.md](docs/outputs.md).
 
 Representative transcript ordering is: MANE Plus Clinical, MANE Select, VEP canonical, protein coding, lower TSL, APPRIS principal, then lexical transcript ID. This selects a display representative only; all transcript rows remain available.
 
@@ -86,7 +125,7 @@ Representative transcript ordering is: MANE Plus Clinical, MANE Select, VEP cano
 bash scripts/run_test.sh
 ```
 
-The test suite includes manifest/path failures, nested keys, combined SO terms, ranking, collapse, and a small Snakemake workflow driven by a mock VEP table. The mock tests parsing and reporting without suggesting VEP ran. A real VEP run requires the full cache and is an optional external integration test:
+The test suite includes manifest/path failures, nested keys, combined SO terms, ranking, SpliceAI INFO parsing and missingness, candidate thresholds, collapse, HTML structure, and a cache-free Snakemake workflow driven by explicit mock VEP and SpliceAI annotations. Synthetic fixtures validate software behavior, not SpliceAI biology. A real integration run requires the full external resources:
 
 ```bash
 snakemake --profile profiles/local --configfile tests/config.test.yaml vep_annotate
@@ -101,10 +140,13 @@ That command is useful only after changing the test reference/cache to compatibl
 - Mixed reference declarations in one run are unsupported.
 - Multi-sample VCFs are recorded and accepted, but outputs remain keyed by manifest sample; genotype-level subsetting is not performed.
 - VEP is run twice (VCF and tabular modes) to keep both native trace output and explicit stable transcript columns.
-- Static HTML is intentionally minimal. There is no clinical evidence model or splice-effect predictor.
+- SpliceAI's configured maximum distance is a model/reporting window, not evidence that every event in that window is biologically meaningful.
+- Exact transcript-relative distance to exon boundaries is not yet calculated. Noncanonical intronic rows are therefore labelled `intronic_noncanonical`, never automatically `deep_intronic`.
+- SpliceAI 1.3.1 supports SNVs and simple indels subject to its own input constraints; unsupported alleles and absent annotations are reported distinctly.
 - Ensembl cache availability and MANE/TSL content depend on the pinned release and transcript set.
+- This is research software, not a pathogenicity classifier or clinical diagnostic system.
 
-To add a predictor, implement a rule, environment, and adapter under the `predictors/` directories and emit the normalized schema in [docs/adding_predictors.md](docs/adding_predictors.md). The recommended next module is a near-splice effect predictor consuming the separately retained `splice_region_variant` candidates.
+To add a predictor, implement a separate rule, environment, and parser following [docs/adding_predictors.md](docs/adding_predictors.md). Pangolin is the recommended next comparison module after validating this SpliceAI MVP on curated examples; it should not replace or overwrite SpliceAI evidence.
 
 ## License and citation
 

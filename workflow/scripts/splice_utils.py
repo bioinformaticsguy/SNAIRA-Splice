@@ -35,7 +35,10 @@ def truthy_flag(value: Any) -> bool:
 
 
 def _tsl_rank(value: Any) -> int:
-    token = str(value or "").split()[0].replace("tsl", "")
+    tokens = str(value or "").split()
+    if not tokens:
+        return 99
+    token = tokens[0].replace("tsl", "")
     try:
         return int(token)
     except ValueError:

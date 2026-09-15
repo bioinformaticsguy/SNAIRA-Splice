@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "snaira-splice"
-version = "0.1.0"
-description = "Canonical splice consequence annotation workflow"
+version = "0.2.0.dev0"
+description = "Standalone VEP and SpliceAI splice-variant analysis workflow"
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
@@ -19,6 +19,9 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"workflow/scripts/generate_report.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.11"

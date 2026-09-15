@@ -1,0 +1,7 @@
+##fileformat=VCFv4.2
+##INFO=<ID=SpliceAI,Number=.,Type=String,Description="Synthetic parser fixture; not a biological prediction">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr21	20	chr21:20:A:G	A	G	.	PASS	SpliceAI=G|MOCK1|0.00|0.01|0.02|0.00|-2|3|5|-4
+chr21	30	chr21:30:A:T	A	T	.	PASS	SpliceAI=T|MOCK2|0.10|0.00|0.00|0.00|-6|2|4|-3
+chr21	40	chr21:40:A:C	A	C	.	PASS	SpliceAI=C|MOCK3|0.01|0.00|0.85|0.02|-1|2|7|-3
+chr21	50	chr21:50:A:G	A	G	.	PASS	.

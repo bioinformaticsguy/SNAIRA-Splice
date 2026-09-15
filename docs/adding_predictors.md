@@ -1,6 +1,6 @@
 # Adding splice predictors
 
-Add a rule under `workflow/rules/predictors/`, an adapter under `workflow/scripts/predictors/`, and a pinned focused environment under `workflow/envs/predictors/`. Do not modify canonical consequence classification to accommodate a score.
+SpliceAI is the reference implementation: `workflow/rules/spliceai.smk` owns execution, `parse_spliceai_vcf.py` owns its format, and `spliceai.yaml` owns dependencies. A future predictor should add the same three boundaries (preferably under predictor subdirectories once a second implementation exists). Do not parse one predictor inside another tool's script or modify canonical consequence classification to accommodate a score.
 
 Every adapter should emit a compressed TSV with these columns:
 
@@ -19,3 +19,5 @@ Every adapter should emit a compressed TSV with these columns:
 | `missing_value_reason` | explicit reason when an applicable value is absent |
 
 Applicability belongs in configuration and metadata, not inference from missing scores. A module declares one or more of `canonical`, `near_splice`, `exonic_motif`, and `deep_intronic`; rows outside applicability should not be scored. Integration should preserve multiple predictors and contexts rather than overwriting them. The existing noncanonical splice-region table is the natural input boundary for a near-splice module.
+
+An adapter must distinguish at least `scored`, `not_scored`, `unsupported_variant`, and a failed predictor job. It must preserve native fields before harmonization, define tie behavior, and document coordinate semantics. Adding Pangolin or SQUIRLS later should extend the evidence vector and report rather than replace `SpliceAI_max` or manufacture cross-tool equivalence.

@@ -2,3 +2,5 @@
 Uploaded_variation	Location	Allele	Gene	Feature	Feature_type	Consequence	IMPACT	SYMBOL	BIOTYPE	EXON	INTRON	HGVSc	Existing_variation	STRAND	CANONICAL	MANE_SELECT	MANE_PLUS_CLINICAL	TSL	APPRIS	REF_ALLELE
 chr21_20_A/G	chr21:20	G	ENSG0001	ENST0001	Transcript	splice_donor_variant&intron_variant	HIGH	MOCK1	protein_coding		1/2	ENST0001:c.10+1A>G	rsMock	1	YES	NM_000001.1		1	principal1	A
 chr21_30_A/T	chr21:30	T	ENSG0002	ENST0002	Transcript	missense_variant&splice_region_variant	MODERATE	MOCK2	protein_coding	2/3		ENST0002:c.30A>T		-1				2	alternative1	A
+chr21_40_A/C	chr21:40	C	ENSG0003	ENST0003	Transcript	intron_variant	MODIFIER	MOCK3	protein_coding		2/3	ENST0003:c.40+250A>C		1	YES			1	principal2	A
+chr21_50_A/G	chr21:50	G	ENSG0004	ENST0004	Transcript	synonymous_variant	LOW	MOCK4	protein_coding	3/4		ENST0004:c.50A>G		1				3	alternative2	A

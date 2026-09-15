@@ -1,5 +1,7 @@
 rule all:
-    input: "tests/work/e2e/summary.json"
+    input:
+        "tests/work/e2e/summary.json",
+        "tests/work/e2e/SYNTHETIC-1.snaira_splice.html"
 
 rule mock_vep_gzip:
     input: "tests/data/mock.vep.tsv"
@@ -31,3 +33,59 @@ rule summary:
     shell:
         "python3 workflow/scripts/summarize_results.py --variants {input.variants} --transcripts {input.transcripts} "
         "--regions {input.regions} --label synthetic --tsv {output.tsv} --json {output.json} --html {output.html}"
+
+rule mock_spliceai_gzip:
+    input: "tests/data/mock.spliceai.vcf"
+    output: "tests/work/e2e/mock.spliceai.vcf.gz"
+    shell: "gzip -c {input} > {output}"
+
+rule parse_spliceai:
+    input: "tests/work/e2e/mock.spliceai.vcf.gz"
+    output: "tests/work/e2e/spliceai_evidence.tsv.gz"
+    shell:
+        "python3 workflow/scripts/parse_spliceai_vcf.py --input {input} --output {output} --sample-id SYNTHETIC-1"
+
+rule parse_all_vep:
+    input: "tests/work/e2e/mock.vep.tsv.gz"
+    output: "tests/work/e2e/vep.transcripts.tsv.gz"
+    shell:
+        "python3 workflow/scripts/parse_vep_transcripts.py --input {input} --output {output} "
+        "--sample-id SYNTHETIC-1 --source-vcf synthetic.vcf.gz --source-manifest synthetic.json "
+        "--annotation-version 113"
+
+rule candidates:
+    input:
+        vep="tests/work/e2e/vep.transcripts.tsv.gz",
+        spliceai="tests/work/e2e/spliceai_evidence.tsv.gz"
+    output:
+        transcripts="tests/work/e2e/splice_candidates.transcripts.tsv.gz",
+        variants="tests/work/e2e/splice_candidates.variants.tsv.gz",
+        review="tests/work/e2e/splice_review.variants.tsv.gz"
+    shell:
+        "python3 workflow/scripts/build_splice_candidates.py --vep {input.vep} --spliceai {input.spliceai} "
+        "--candidate-threshold 0.20 --review-threshold 0.05 --transcripts {output.transcripts} "
+        "--variants {output.variants} --review {output.review}"
+
+rule mock_versions:
+    output:
+        vep="tests/work/e2e/vep.version.txt",
+        spliceai="tests/work/e2e/spliceai.version.txt"
+    shell: "echo 'VEP 113 synthetic fixture' > {output.vep}; echo '1.3.1 synthetic fixture' > {output.spliceai}"
+
+rule report:
+    input:
+        candidates="tests/work/e2e/splice_candidates.variants.tsv.gz",
+        review="tests/work/e2e/splice_review.variants.tsv.gz",
+        transcripts="tests/work/e2e/splice_candidates.transcripts.tsv.gz",
+        evidence="tests/work/e2e/spliceai_evidence.tsv.gz",
+        vep_version="tests/work/e2e/vep.version.txt",
+        spliceai_version="tests/work/e2e/spliceai.version.txt"
+    output: "tests/work/e2e/SYNTHETIC-1.snaira_splice.html"
+    shell:
+        "python3 workflow/scripts/generate_report.py --candidates {input.candidates} --review {input.review} "
+        "--transcripts {input.transcripts} --spliceai-evidence {input.evidence} --output {output} "
+        "--sample-id SYNTHETIC-1 --assembly GRCh38 --pipeline-version test --run-date synthetic "
+        "--vep-version-file {input.vep_version} --spliceai-version-file {input.spliceai_version} "
+        "--spliceai-mode local_unmasked --spliceai-max-distance 5000 --candidate-threshold 0.20 "
+        "--review-threshold 0.05 --reference tests/data/GRCh38.mini.fa "
+        "--annotation tests/data/spliceai.grch38.mock.txt --config tests/config.test.yaml"

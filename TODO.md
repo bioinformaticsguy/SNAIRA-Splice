@@ -1,8 +1,8 @@
-# SQ2 — The Splicing Gap prototype tracker
+# SNAIRA-Splice / SQ2 progress tracker
 
 This file tracks the side quest:
 
-> **SQ2:** Have a working prototype of The Splicing Gap integrated with VIPER.
+> **Current iteration:** deliver a useful standalone VEP + SpliceAI report. VIPER/CALIGO integration is deferred and is not a completion criterion for this MVP.
 
 It is intended to be updated through normal GitHub commits and pull requests. A checked item (`[x]`) means that the stated deliverable exists and has been verified. A parent milestone remains unchecked until all of its required items are complete.
 
@@ -10,27 +10,27 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
 
 | Milestone | Status | Current result |
 |---|---|---|
-| SQ2.1 Conceptual workflow and categories | In progress | Canonical category and annotation/prediction separation are defined; remaining category boundaries need finalization. |
-| SQ2.2 Tools and evidence sources | In progress | VEP is selected and implemented for canonical consequence annotation; other classes remain to be selected. |
+| SQ2.1 Conceptual workflow and categories | Complete | Category specification v1.0 is frozen in `docs/splice-category-specification-v1.0.md`. |
+| SQ2.2 Tools and evidence sources | In progress | VEP and local SpliceAI are implemented; comparison predictors and other evidence classes are deferred. |
 | SQ2.3 Multi-tool scoring and tissue context | In progress | A normalized predictor interface is drafted; scoring and tissue models are not implemented. |
-| SQ2.4 Example-variant evaluation | In progress | Synthetic parsing tests exist; curated biological examples and documented results remain outstanding. |
-| SQ2.5 Shareable HTML report | In progress | Static sample/cohort summaries exist; an integrated VIPER-facing report remains outstanding. |
+| SQ2.4 Example-variant evaluation | In progress | Synthetic VEP/SpliceAI integration tests exist; a real resource-backed sample remains outstanding. |
+| SQ2.5 Shareable HTML report | In progress | A standalone variant-centric report is implemented; real-sample review and accessibility/scale checks remain. |
 
 ## SQ2.1 — Finalize the conceptual workflow and splice-variant categories
 
-- [ ] **Complete SQ2.1**
+- [x] **Complete SQ2.1**
   - [x] Separate *variant consequence annotation* from *splice-effect prediction*.
   - [x] Define canonical splice candidates as VEP `splice_donor_variant` or `splice_acceptor_variant` consequences.
   - [x] Exclude `splice_region_variant` from the canonical candidate set.
   - [x] Retain non-canonical `splice_region_variant` annotations for later use.
   - [x] Define the initial workflow boundary: manifest → small-variant VCF → normalization → VEP → transcript table → allele table → summaries.
-  - [ ] Write precise, assembly-aware boundaries for the **near-splice** category.
-  - [ ] Define the **exonic splicing-motif** category, including overlap with coding consequences.
-  - [ ] Define the **deep-intronic** category and its distance/exclusion rules.
-  - [ ] Decide how variants belonging to multiple categories are represented without forced mutual exclusivity.
-  - [ ] Define transcript scope for every category: all transcripts, MANE, canonical, protein coding, or configurable subsets.
-  - [ ] Document how category definitions map onto VIPER inputs and outputs.
-  - [ ] Review and freeze a versioned category specification for the prototype.
+  - [x] Write precise, assembly-aware boundaries for the **near-splice** category.
+  - [x] Define the **exonic splicing-motif** category, including overlap with coding consequences.
+  - [x] Define the **deep-intronic** category and its distance/exclusion rules.
+  - [x] Decide how variants belonging to multiple categories are represented without forced mutual exclusivity.
+  - [x] Define transcript scope for every category: all transcripts, MANE, canonical, protein coding, or configurable subsets.
+  - [x] Document how category definitions map onto VIPER inputs and outputs.
+  - [x] Review and freeze a versioned category specification for the prototype.
 
 **Done when:** `docs/` contains a versioned category specification with unambiguous inclusion, exclusion, overlap, transcript, and assembly rules for all four categories, plus the VIPER hand-off contract.
 
@@ -42,6 +42,8 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
   - [x] Select VEP/MANE/canonical/TSL/APPRIS fields for deterministic transcript representation.
   - [x] Pin the first implementation to VEP/cache release 113 and GRCh38.
   - [x] Provide a normalized interface for adding predictors without fabricating missing results.
+  - [x] Select and implement local SpliceAI 1.3.1 as the first splice-effect predictor.
+  - [x] Record SpliceAI DS/DP fields, tied events, coordinate predictions, and explicit missingness.
   - [ ] Define explicit tool-selection criteria: license, local/offline execution, reproducibility, supported assemblies, transcript model, runtime, and redistribution constraints.
   - [ ] Evaluate and select one or more **near-splice** predictors.
   - [ ] Evaluate and select one or more **exonic splicing-motif** tools or evidence sources.
@@ -83,6 +85,7 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
   - [x] Test combined consequence terms and canonical/non-canonical separation.
   - [x] Test transcript ranking and allele-level collapse.
   - [x] Run a cache-free end-to-end Snakemake test using clearly identified mock VEP annotations.
+  - [x] Exercise canonical-low-score, splice-region, noncanonical-intronic-high-score, zero, and missing SpliceAI software behavior in synthetic tests.
   - [ ] Assemble a versioned example-variant set containing positive and negative examples for every category.
   - [ ] Include donor, acceptor, near-splice, exonic-motif, deep-intronic, multiallelic, indel, and multi-transcript cases.
   - [ ] Add examples where predictors disagree or are not applicable.
@@ -103,20 +106,20 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
   - [x] Generate static per-sample HTML count summaries.
   - [x] Generate a static cohort HTML count summary.
   - [x] Retain TSV and JSON companions for traceability.
-  - [ ] Define the report audience and minimum interpretation disclaimer.
-  - [ ] Design an integrated variant-centric report spanning consequence, prediction, tissue context, and VIPER evidence.
-  - [ ] Add filtering or navigation by sample, gene, category, transcript, predictor, and evidence tier where useful.
-  - [ ] Show raw scores, normalized scores, applicability, missingness reasons, and provenance rather than only a final rank.
-  - [ ] Add links between allele-level summaries and full transcript-level evidence.
-  - [ ] Add resource/software versions and reproducibility metadata to the visible report.
-  - [ ] Ensure the report is self-contained or package all required assets for sharing.
+  - [x] Define the report audience and minimum interpretation disclaimer.
+  - [x] Design a standalone variant-centric report combining VEP consequence and SpliceAI evidence.
+  - [x] Add filtering/navigation by gene, category, consequence, score threshold, and MANE status.
+  - [x] Show native DS/DP scores, explicit missingness, and provenance rather than a pathogenicity rank.
+  - [x] Link allele summaries to expandable full transcript evidence.
+  - [x] Add resource/software versions and reproducibility metadata to the visible report.
+  - [x] Ensure the report is self-contained with embedded CSS and JavaScript.
   - [ ] Check accessibility, readable print/PDF output, and behavior with zero, small, and large result sets.
   - [ ] Add snapshot or structural tests for report generation.
   - [ ] Generate and review a representative shareable report from the SQ2.4 example set.
 
 **Done when:** the example run produces a reviewed, portable HTML report that communicates evidence and limitations clearly and can be shared without access to the execution environment.
 
-## Cross-cutting prototype and VIPER integration
+## Deferred cross-cutting VIPER integration
 
 - [ ] Define the supported VIPER version and pin it in integration tests.
 - [ ] Agree on stable input/output schemas and ownership boundaries between SNAIRA-Splice and VIPER.
@@ -140,6 +143,6 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
 
 ## Suggested next three tasks
 
-- [ ] Draft the versioned category specification for near-splice, exonic-motif, and deep-intronic variants.
+- [x] Draft the versioned category specification for near-splice, exonic-motif, and deep-intronic variants.
 - [ ] Build the SQ2.2 tool/evidence decision matrix.
-- [ ] Define the concrete SNAIRA-Splice ↔ VIPER exchange schema before adding the first splice-effect predictor.
+- [ ] Validate the standalone SpliceAI report on one real sample before selecting a second predictor.

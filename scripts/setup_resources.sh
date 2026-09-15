@@ -11,6 +11,7 @@ Usage: setup_resources.sh [options]
   --download-reference          Install reference FASTA, faidx, and dictionary
   --download-vep-cache          Install the offline VEP cache
   --install-software            Create the pinned VEP Conda environment separately
+  --install-spliceai            Install pinned SpliceAI software and copy its GRCh38 annotation
   --force                       Replace an existing completed requested resource
   -h, --help                    Show this help
 EOF
@@ -23,6 +24,7 @@ species="homo_sapiens"
 download_reference=false
 download_cache=false
 install_software=false
+install_spliceai=false
 force=false
 while (($#)); do
   case "$1" in
@@ -33,14 +35,18 @@ while (($#)); do
     --download-reference) download_reference=true; shift ;;
     --download-vep-cache) download_cache=true; shift ;;
     --install-software) install_software=true; shift ;;
+    --install-spliceai) install_spliceai=true; shift ;;
     --force) force=true; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "ERROR: unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
 [[ "$assembly" == "GRCh38" ]] || { echo "ERROR: only GRCh38 is supported" >&2; exit 2; }
-$download_reference || $download_cache || $install_software || { echo "ERROR: select at least one action" >&2; usage >&2; exit 2; }
-for command in curl sha256sum sum; do command -v "$command" >/dev/null || { echo "ERROR: required command not found: $command" >&2; exit 1; }; done
+$download_reference || $download_cache || $install_software || $install_spliceai || { echo "ERROR: select at least one action" >&2; usage >&2; exit 2; }
+command -v sha256sum >/dev/null || { echo "ERROR: required command not found: sha256sum" >&2; exit 1; }
+if $download_reference || $download_cache; then
+  for command in curl sum; do command -v "$command" >/dev/null || { echo "ERROR: required command not found: $command" >&2; exit 1; }; done
+fi
 
 mkdir -p "$resource_dir"
 resource_dir="$(cd "$resource_dir" && pwd)"
@@ -83,9 +89,39 @@ if $install_software; then
     echo "VEP software already complete: $software_prefix"
   else
     mkdir -p "$resource_dir/software"
-    conda env create --prefix "$software_prefix" --file workflow/envs/vep.yaml --yes
+    if [[ -d "$software_prefix" ]]; then
+      conda env update --prefix "$software_prefix" --file workflow/envs/vep.yaml --prune --yes
+    else
+      conda env create --prefix "$software_prefix" --file workflow/envs/vep.yaml --yes
+    fi
     "$software_prefix/bin/vep" --help >/dev/null
     date -u +%FT%TZ > "$software_prefix/.complete"
+  fi
+fi
+
+if $install_spliceai; then
+  command -v conda >/dev/null || { echo "ERROR: conda is required for --install-spliceai" >&2; exit 1; }
+  spliceai_prefix="$resource_dir/software/spliceai-1.3.1"
+  spliceai_dir="$resource_dir/spliceai"
+  spliceai_marker="$spliceai_dir/.spliceai-1.3.1.complete"
+  if [[ -f "$spliceai_marker" ]] && ! $force; then
+    echo "SpliceAI resources already complete: $spliceai_dir"
+  else
+    mkdir -p "$resource_dir/software" "$spliceai_dir"
+    if [[ ! -x "$spliceai_prefix/bin/spliceai" ]] || $force; then
+      if [[ -d "$spliceai_prefix" ]]; then
+        conda env update --prefix "$spliceai_prefix" --file workflow/envs/spliceai.yaml --prune --yes
+      else
+        conda env create --prefix "$spliceai_prefix" --file workflow/envs/spliceai.yaml --yes
+      fi
+    fi
+    annotation_source="$(find "$spliceai_prefix/lib" -path '*/spliceai/annotations/grch38.txt' -print -quit)"
+    [[ -f "$annotation_source" ]] || { echo "ERROR: bundled SpliceAI GRCh38 annotation not found" >&2; exit 1; }
+    cp "$annotation_source" "$temporary_dir/grch38.txt"
+    mv "$temporary_dir/grch38.txt" "$spliceai_dir/grch38.txt"
+    "$spliceai_prefix/bin/spliceai" --help >/dev/null
+    record_resource spliceai_grch38_annotation "1.3.1" "$spliceai_dir/grch38.txt" "spliceai Python package"
+    date -u +%FT%TZ > "$spliceai_marker"
   fi
 fi
 
