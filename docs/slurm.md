@@ -53,3 +53,24 @@ bash scripts/slurm/submit_snaira_splice_controller.local.sh \
 Controller logs are written under `logs/`; child-job logs use `logs/slurm/`. Both are ignored by Git. Rule-specific workflow logs remain under the configured result root.
 
 Monitor with your site's normal commands, commonly `squeue -u "$USER"`, `sacct -j JOB_ID`, and the controller log. If a controller dies, fix the cause and resubmit: `rerun-incomplete` is enabled. Do not use `--forceall` against shared results. If Snakemake reports a stale lock only after confirming no controller is still active, run `snakemake --unlock` with the same configuration and working directory.
+
+## Kircherlab regional smoke test
+
+The checked-in Kircherlab helper contains the site values verified on
+2026-09-18: account `hassan`, `shortterm` for the controller and ordinary
+rules, `longterm` for VEP/SpliceAI, and the shared Miniforge and rule-environment
+prefixes. After preparing the regional test and generating its configuration,
+preflight and submit with:
+
+```bash
+bash scripts/slurm/submit_kircherlab_region_test.sh --preflight
+bash scripts/slurm/submit_kircherlab_region_test.sh --submit
+```
+
+The controller submission requests SLURM mail type `ALL` for
+`alihassan1697@gmail.com`. Child rule jobs do not request email independently,
+which avoids one notification stream per workflow rule.
+
+The helper is intentionally specific to this smoke test. Update it if the site
+account, partitions, paths, or sample change; the generic launcher above remains
+the interface for other sites and production runs.
