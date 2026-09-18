@@ -8,6 +8,13 @@ The controller environment from `environment.yaml` already pins the SLURM execut
 
 ## Configure once per cluster
 
+Inspect the available partitions, account associations, Conda installation,
+and controller dependencies without submitting a job:
+
+```bash
+bash scripts/slurm/inspect_slurm_site.sh
+```
+
 ```bash
 cp scripts/slurm/submit_snaira_splice_controller.local.example.sh \
   scripts/slurm/submit_snaira_splice_controller.local.sh
