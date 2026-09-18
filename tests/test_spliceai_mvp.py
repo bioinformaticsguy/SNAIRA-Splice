@@ -81,7 +81,7 @@ def vep(
         "consequence": consequence,
         "impact": "HIGH",
         "existing_variation": "",
-        "annotation_version": "113",
+        "annotation_version": "115",
         "source_vcf": "source.vcf.gz",
         "source_manifest": "manifest.json",
     }
@@ -204,7 +204,7 @@ def test_html_generation_contains_controls_evidence_and_disclaimer() -> None:
         "assembly": "GRCh38",
         "pipeline_version": "test",
         "run_date": "now",
-        "vep_version": "113",
+        "vep_version": "115",
         "spliceai_mode": "local_unmasked",
         "spliceai_max_distance": 5000,
     }

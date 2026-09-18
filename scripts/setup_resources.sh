@@ -6,7 +6,7 @@ usage() {
 Usage: setup_resources.sh [options]
   --assembly GRCh38             Assembly (currently GRCh38 only)
   --resource-dir DIR            Destination (default: resources)
-  --vep-cache-version N         Ensembl/VEP cache release (default: 113)
+  --vep-cache-version N         Ensembl/VEP cache release (default: 115)
   --species NAME                Species (default: homo_sapiens)
   --download-reference          Install reference FASTA, faidx, and dictionary
   --download-vep-cache          Install the offline VEP cache
@@ -19,7 +19,7 @@ EOF
 
 assembly="GRCh38"
 resource_dir="resources"
-vep_version="113"
+vep_version="115"
 species="homo_sapiens"
 download_reference=false
 download_cache=false
@@ -42,6 +42,7 @@ while (($#)); do
   esac
 done
 [[ "$assembly" == "GRCh38" ]] || { echo "ERROR: only GRCh38 is supported" >&2; exit 2; }
+[[ "$vep_version" == "115" ]] || { echo "ERROR: this release pins VEP 115.2 and requires cache release 115" >&2; exit 2; }
 $download_reference || $download_cache || $install_software || $install_spliceai || { echo "ERROR: select at least one action" >&2; usage >&2; exit 2; }
 command -v sha256sum >/dev/null || { echo "ERROR: required command not found: sha256sum" >&2; exit 1; }
 if $download_reference || $download_cache; then
@@ -165,16 +166,17 @@ if $download_cache; then
     tar -tzf "$archive" >/dev/null
     tar -xzf "$archive" -C "$temporary_dir"
     extracted="$temporary_dir/$species"
-    [[ -d "$extracted/$vep_version" ]] || { echo "ERROR: unexpected VEP cache archive layout" >&2; exit 1; }
-    if [[ -d "$cache_root/$species/$vep_version" ]]; then
+    cache_release_dir="${vep_version}_${assembly}"
+    [[ -d "$extracted/$cache_release_dir" ]] || { echo "ERROR: unexpected VEP cache archive layout (expected $species/$cache_release_dir)" >&2; exit 1; }
+    if [[ -d "$cache_root/$species/$cache_release_dir" ]]; then
       $force || { echo "ERROR: incomplete cache exists; use --force" >&2; exit 1; }
-      rm -rf "$cache_root/$species/$vep_version"
+      rm -rf "$cache_root/$species/$cache_release_dir"
     fi
     mkdir -p "$cache_root/$species"
-    mv "$extracted/$vep_version" "$cache_root/$species/$vep_version"
+    mv "$extracted/$cache_release_dir" "$cache_root/$species/$cache_release_dir"
     archive_checksum="$(sha256sum "$archive" | cut -d' ' -f1)"
-    printf '%s  %s\n' "$archive_checksum" "$(basename "$cache_url")" > "$cache_root/$species/$vep_version/archive.sha256"
-    record_resource vep_cache_archive "$vep_version" "$cache_root/$species/$vep_version/archive.sha256" "$cache_url"
+    printf '%s  %s\n' "$archive_checksum" "$(basename "$cache_url")" > "$cache_root/$species/$cache_release_dir/archive.sha256"
+    record_resource vep_cache_archive "$vep_version" "$cache_root/$species/$cache_release_dir/archive.sha256" "$cache_url"
     date -u +%FT%TZ > "$marker"
   fi
 fi

@@ -39,7 +39,7 @@ conda activate snaira-splice
 bash scripts/setup_resources.sh \
   --assembly GRCh38 \
   --resource-dir resources \
-  --vep-cache-version 113 \
+  --vep-cache-version 115 \
   --species homo_sapiens \
   --download-reference \
   --download-vep-cache \
@@ -60,7 +60,7 @@ The final report is `results/S001/05_report/S001.snaira_splice.html`. Use `--dry
 
 The ordinary workflow never downloads large data. The restartable setup command downloads to a temporary directory, validates archive structure, builds FASTA indexes/dictionary, records SHA-256 checksums and versions, and creates completion markers last. `--force` replaces a requested installed resource. VEP and SpliceAI are pinned in focused rule environments. `--install-software` and `--install-spliceai` can materialize those environments under the resource directory. No root or system installation is used. SpliceAI 1.3.1 has non-commercial use restrictions and its upstream repository is archived; review its license before use. See [docs/spliceai.md](docs/spliceai.md).
 
-Update `config/config.yaml` after setup. The default VEP release is 113 and the default transcript source is Ensembl. `refseq` and `merged` select VEP's corresponding modes. MANE, canonical, TSL, and APPRIS annotations are configurable. Both annotated VCF and transcript-oriented TSV are required in this milestone to preserve traceability.
+Update `config/config.yaml` after setup. The default VEP executable is 115.2 and the matching cache release is 115; executable and cache releases must match. The default transcript source is Ensembl. `refseq` and `merged` select VEP's corresponding modes. MANE, canonical, TSL, and APPRIS annotations are configurable. Both annotated VCF and transcript-oriented TSV are required in this milestone to preserve traceability.
 
 ## Manifests and configuration
 

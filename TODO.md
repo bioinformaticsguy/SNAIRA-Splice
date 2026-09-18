@@ -40,7 +40,7 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
   - [x] Select bcftools for decomposition, left alignment, and REF validation.
   - [x] Select Ensembl VEP for transcript-level canonical splice consequence annotation.
   - [x] Select VEP/MANE/canonical/TSL/APPRIS fields for deterministic transcript representation.
-  - [x] Pin the first implementation to VEP/cache release 113 and GRCh38.
+  - [x] Pin the current implementation to VEP 115.2/cache release 115 and GRCh38.
   - [x] Provide a normalized interface for adding predictors without fabricating missing results.
   - [x] Select and implement local SpliceAI 1.3.1 as the first splice-effect predictor.
   - [x] Record SpliceAI DS/DP fields, tied events, coordinate predictions, and explicit missingness.

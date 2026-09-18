@@ -27,7 +27,7 @@ properties:
     required: [cache_directory, cache_version, species, assembly, annotation_format, forks, offline, transcript_set, include_mane, include_canonical, include_tsl, retain_all_transcript_consequences]
     properties:
       cache_directory: {type: string}
-      cache_version: {type: integer, minimum: 100}
+      cache_version: {type: integer, enum: [115]}
       species: {const: homo_sapiens}
       assembly: {const: GRCh38}
       annotation_format: {enum: [vep_cache]}

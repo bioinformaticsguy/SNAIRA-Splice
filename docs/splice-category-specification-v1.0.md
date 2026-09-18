@@ -7,7 +7,7 @@
 | Status | Frozen for the SQ2 prototype |
 | Frozen on | 2026-08-10 |
 | Default assembly | GRCh38 |
-| Default annotation | Ensembl VEP/cache release 113, Ensembl transcripts |
+| Default annotation | Ensembl VEP 115.2/cache release 115, Ensembl transcripts |
 
 ## 1. Purpose and normative language
 

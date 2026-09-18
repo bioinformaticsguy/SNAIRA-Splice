@@ -10,7 +10,7 @@ reference:
   dictionary: resources/reference/GRCh38.dict
 vep:
   cache_directory: resources/vep
-  cache_version: 113
+  cache_version: 115
   species: homo_sapiens
   assembly: GRCh38
   annotation_format: vep_cache

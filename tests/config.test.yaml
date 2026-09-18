@@ -10,7 +10,7 @@ reference:
   dictionary: tests/data/GRCh38.mini.dict
 vep:
   cache_directory: tests/data/fake_vep_cache
-  cache_version: 113
+  cache_version: 115
   species: homo_sapiens
   assembly: GRCh38
   annotation_format: vep_cache
