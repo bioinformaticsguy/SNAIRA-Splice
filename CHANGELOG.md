@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add a checked-in Kircherlab resource configuration and reproducible BRCA1-region smoke-test helper to replace repeated interactive path exports.
 - Align the pinned VEP executable and default offline cache with Ensembl release 115 (VEP 115.2), including the assembly-qualified indexed-cache directory layout.
 - Add a standalone SpliceAI 1.3.1 branch, explicit score/missingness parsing, candidate/review integration, one-sample wrapper, and variant-centric portable HTML report.
 - Preserve canonical and splice-region VEP candidates while admitting noncanonical exonic/intronic alleles using configurable SpliceAI thresholds.
