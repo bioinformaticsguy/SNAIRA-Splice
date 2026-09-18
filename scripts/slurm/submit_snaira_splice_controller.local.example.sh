@@ -3,7 +3,7 @@
 set -euo pipefail
 
 export SNAIRA_MINIFORGE_PATH="/path/to/miniforge"
-export SNAIRA_SNAKEMAKE_ENV="splicing-gap"
+export SNAIRA_SNAKEMAKE_ENV="snaira-splice"
 export SNAIRA_CONDA_PREFIX="/path/to/shared/snaira-splice-conda"
 export SNAIRA_SHORT_PARTITION="short"
 export SNAIRA_LONG_PARTITION="long"

@@ -34,7 +34,7 @@ Use Conda/Mamba on Linux:
 
 ```bash
 conda env create -f environment.yaml
-conda activate splicing-gap
+conda activate snaira-splice
 
 bash scripts/setup_resources.sh \
   --assembly GRCh38 \

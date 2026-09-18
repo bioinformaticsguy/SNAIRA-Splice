@@ -30,7 +30,7 @@ mkdir -p logs logs/slurm .snakemake/locks
 exec > >(tee -a "logs/controller_$(date +%Y%m%dT%H%M%S)_${SLURM_JOB_ID:-manual}.log") 2>&1
 
 source "$SNAIRA_MINIFORGE_PATH/etc/profile.d/conda.sh"
-snakemake_env="${SNAIRA_SNAKEMAKE_ENV:-splicing-gap}"
+snakemake_env="${SNAIRA_SNAKEMAKE_ENV:-snaira-splice}"
 conda activate "$snakemake_env"
 python -c 'import snakemake_executor_plugin_slurm' >/dev/null || {
   echo "ERROR: SLURM executor plugin is unavailable in $snakemake_env" >&2

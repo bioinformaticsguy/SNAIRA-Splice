@@ -1,4 +1,4 @@
-name: splicing-gap
+name: snaira-splice
 channels: [conda-forge, bioconda]
 dependencies:
   - python=3.12.8
