@@ -37,8 +37,8 @@ outputs:
 temporary_directory: /data/humangen_kircherlab/Users/hassan/snaira-splice-runs/tmp
 resources:
   normalize: {threads: 2, mem_mb: 4096, runtime: 60}
-  vep: {threads: 4, mem_mb: 16384, runtime: 480}
-  spliceai: {threads: 1, mem_mb: 16384, runtime: 720}
+  vep: {threads: 4, mem_mb: 32768, runtime: 480}
+  spliceai: {threads: 1, mem_mb: 32768, runtime: 720}
   python: {threads: 1, mem_mb: 4096, runtime: 60}
   reporting: {threads: 1, mem_mb: 2048, runtime: 30}
 logging:

@@ -71,12 +71,13 @@ The controller submission requests SLURM mail type `ALL` for
 `alihassan1697@gmail.com`. Child rule jobs do not request email independently,
 which avoids one notification stream per workflow rule.
 
-The Kircherlab controller requests 16 GB of memory because Snakemake performs
+The Kircherlab controller requests 32 GB of memory because Snakemake performs
 Conda dependency solving and creates rule environments in the controller
 process. A 4 GB controller was insufficient for resolving the pinned VEP 115.2
 environment during the first cluster smoke test. This memory is for workflow
-orchestration and environment creation; rule memory remains independently
-configured in the workflow profile.
+orchestration and environment creation. The Kircherlab smoke-test helper also
+requests 32 GB for each VEP and SpliceAI child job; lightweight parsing and
+reporting rules retain their smaller allocations.
 
 The helper is intentionally specific to this smoke test. Update it if the site
 account, partitions, paths, or sample change; the generic launcher above remains

@@ -39,6 +39,8 @@ python -c 'import snakemake_executor_plugin_slurm' >/dev/null || {
 
 max_jobs="${SNAIRA_MAX_JOBS:-40}"
 max_threads="${SNAIRA_MAX_THREADS_PER_JOB:-16}"
+vep_mem_mb="${SNAIRA_VEP_MEM_MB:-16384}"
+spliceai_mem_mb="${SNAIRA_SPLICEAI_MEM_MB:-16384}"
 max_cores=$((max_jobs * max_threads))
 conda_prefix_args=()
 [[ -z "${SNAIRA_CONDA_PREFIX:-}" ]] || conda_prefix_args=(--conda-prefix "$SNAIRA_CONDA_PREFIX")
@@ -46,7 +48,9 @@ default_resources=(--default-resources mem_mb=2048 runtime=60 "slurm_partition=$
 [[ -z "${SNAIRA_SLURM_ACCOUNT:-}" ]] || default_resources+=("slurm_account=$SNAIRA_SLURM_ACCOUNT")
 long_rules=(
   "vep_annotate:slurm_partition=$SNAIRA_LONG_PARTITION"
+  "vep_annotate:mem_mb=$vep_mem_mb"
   "spliceai_predict:slurm_partition=$SNAIRA_LONG_PARTITION"
+  "spliceai_predict:mem_mb=$spliceai_mem_mb"
 )
 
 snakemake --snakefile Snakefile "${targets[@]}" \
