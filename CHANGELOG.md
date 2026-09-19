@@ -4,6 +4,7 @@
 
 - Correct VEP consequence parsing for both comma-separated tabular output and ampersand-separated CSQ-style terms, preventing missed canonical and splice-region annotations.
 - Add a documented, one-command cache-free synthetic workflow test using the committed fixture.
+- Add a one-command regional preflight that prepares the test VCF, dry-runs the DAG, and validates SLURM without submitting jobs.
 
 ## Unreleased
 

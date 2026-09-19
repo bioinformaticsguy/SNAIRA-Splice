@@ -60,10 +60,17 @@ The final report is `results/S001/05_report/S001.snaira_splice.html`. Use `--dry
 
 For the current cluster, `config/cluster.yaml` contains the verified shared
 resource paths and the regional helper defaults to the prepared real sample.
-The helper never modifies the source VCF:
+The helper never modifies the source VCF. Run the complete no-submission
+preflight with one command:
 
 ```bash
-bash scripts/run_region_test.sh --dry-run
+bash scripts/preflight_region_test.sh
+```
+
+Submit only after that passes:
+
+```bash
+bash scripts/slurm/submit_region_test.sh --submit
 ```
 
 The smoke-test output root is `output/results/` inside the repository; for

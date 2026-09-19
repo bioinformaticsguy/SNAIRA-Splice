@@ -59,16 +59,16 @@ Monitor with your site's normal commands, commonly `squeue -u "$USER"`, `sacct -
 Use a small region from a real sample to validate installed resources before a
 whole-genome run. `config/cluster.yaml` contains the current shared-resource
 paths and `run_region_test.sh` defaults to the prepared smoke-test sample. The
-source VCF remains immutable:
+source VCF remains immutable. Run the complete preflight without submitting
+jobs:
 
 ```bash
-bash scripts/run_region_test.sh --dry-run
+bash scripts/preflight_region_test.sh
 ```
 
-Preflight or submit the generated run configuration:
+Submit the generated run configuration only after the preflight passes:
 
 ```bash
-bash scripts/slurm/submit_region_test.sh --preflight
 bash scripts/slurm/submit_region_test.sh --submit
 ```
 
