@@ -1,0 +1,12 @@
+contents.txt
+generated-run-config.yaml
+git-log.txt
+git-revision.txt
+git-status.txt
+log-1-3326218_hassan_node24_snaira_splice_controller.out_.tail.txt
+log-2-controller_20260918T193530_3326218.log_.tail.txt
+log-3-3326218_hassan_node24_snaira_splice_controller.err_.tail.txt
+matching-log-files.txt
+README.txt
+sacct.txt
+scontrol-show-job.txt

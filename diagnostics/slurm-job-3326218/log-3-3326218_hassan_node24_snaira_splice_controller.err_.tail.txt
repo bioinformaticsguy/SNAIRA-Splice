@@ -1,0 +1,3 @@
+Original path: logs/3326218_hassan_node24_snaira_splice_controller.err
+Retained tail: 300 lines
+

@@ -1,0 +1,5 @@
+4844c16 Add SLURM diagnostic bundle helper
+8965fe7 Increase cluster workflow memory allocations
+58f2d5e Increase SLURM controller memory
+cc1d61d Add Kircherlab SLURM test launcher
+7864218 Add SLURM site inspection helper

@@ -1,0 +1,3 @@
+1789839338.6160772220	logs/3326218_hassan_node24_snaira_splice_controller.out
+1789839338.6149623290	logs/controller_20260918T193530_3326218.log
+1789752930.2225951190	logs/3326218_hassan_node24_snaira_splice_controller.err
