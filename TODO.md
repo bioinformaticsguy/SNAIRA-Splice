@@ -13,7 +13,7 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
 | SQ2.1 Conceptual workflow and categories | Complete | Category specification v1.0 is frozen in `docs/splice-category-specification-v1.0.md`. |
 | SQ2.2 Tools and evidence sources | In progress | VEP and local SpliceAI are implemented; comparison predictors and other evidence classes are deferred. |
 | SQ2.3 Multi-tool scoring and tissue context | In progress | A normalized predictor interface is drafted; scoring and tissue models are not implemented. |
-| SQ2.4 Example-variant evaluation | In progress | Synthetic VEP/SpliceAI integration tests exist; a real resource-backed sample remains outstanding. |
+| SQ2.4 Example-variant evaluation | In progress | Versioned public GRCh38 curated panel and evaluator are implemented; its first full resource-backed run remains outstanding. |
 | SQ2.5 Shareable HTML report | In progress | A standalone variant-centric report is implemented; real-sample review and accessibility/scale checks remain. |
 
 ## SQ2.1 — Finalize the conceptual workflow and splice-variant categories
@@ -86,10 +86,10 @@ It is intended to be updated through normal GitHub commits and pull requests. A 
   - [x] Test transcript ranking and allele-level collapse.
   - [x] Run a cache-free end-to-end Snakemake test using clearly identified mock VEP annotations.
   - [x] Exercise canonical-low-score, splice-region, noncanonical-intronic-high-score, zero, and missing SpliceAI software behavior in synthetic tests.
-  - [ ] Assemble a versioned example-variant set containing positive and negative examples for every category.
+  - [x] Assemble a versioned public example-variant set covering canonical, near-splice, exonic-motif, deep-intronic, and the intentional proximal-intronic gap (`tests/curated/`).
   - [ ] Include donor, acceptor, near-splice, exonic-motif, deep-intronic, multiallelic, indel, and multi-transcript cases.
   - [ ] Add examples where predictors disagree or are not applicable.
-  - [ ] Define expected results and acceptance criteria before running the evaluation.
+  - [x] Define expected results and acceptance criteria before running the evaluation (`docs/curated-evaluation.md`).
   - [ ] Run a real VEP integration test using the pinned GRCh38 cache.
   - [ ] Run each selected splice-effect predictor on its applicable examples.
   - [ ] Compare outputs with published, clinical, or experimental evidence where available.

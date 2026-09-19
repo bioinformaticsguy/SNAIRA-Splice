@@ -167,6 +167,8 @@ snakemake --profile profiles/local --configfile tests/config.test.yaml vep_annot
 
 That command is useful only after changing the test reference/cache to compatible full GRCh38 resources.
 
+For a small real-allele regression evaluation using the full external resources, see [docs/curated-evaluation.md](docs/curated-evaluation.md). The committed panel contains public ClinVar GRCh38 coordinates in a synthetic sample, evaluates VEP/GTF-category/SpliceAI behaviour without using clinical classification as pipeline truth, and produces a strict expected-versus-observed TSV.
+
 ## Troubleshooting and limitations
 
 - A REF mismatch is fatal by design; verify the assembly and FASTA rather than using a permissive normalization mode.

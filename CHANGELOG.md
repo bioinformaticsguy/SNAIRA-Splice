@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add a versioned public GRCh38 curated-allele panel, preparation/submission/evaluation helpers, strict expected-versus-observed report, and unit tests for canonical, near-splice, deep-intronic, exonic-motif, and proximal-intronic-gap behaviour.
 - Add release-matched GTF-backed transcript-relative splice categories, including exact intronic junction distances, non-exclusive canonical/near/exonic-motif/deep-intronic assignments, an atomic assignment table, candidate/report category fields, and boundary tests.
 - Add explicit `--download-gtf` resource setup support for the Ensembl GTF pinned to the VEP/cache release.
 - Correct VEP consequence parsing for both comma-separated tabular output and ampersand-separated CSQ-style terms, preventing missed canonical and splice-region annotations.

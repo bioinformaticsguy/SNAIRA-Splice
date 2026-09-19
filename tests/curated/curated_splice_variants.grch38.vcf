@@ -1,0 +1,12 @@
+##fileformat=VCFv4.2
+##fileDate=20260920
+##reference=GRCh38
+##INFO=<ID=CURATED_CASE,Number=1,Type=String,Description="Versioned SNAIRA-Splice curated evaluation case identifier">
+##INFO=<ID=CLINVAR_VARIATION_ID,Number=1,Type=String,Description="ClinVar Variation ID used only as external evaluation provenance">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Synthetic heterozygous evaluation genotype; not a patient call">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	CURATED-SPLICE-1
+chr6	51903693	VCV000558073	C	T	.	PASS	CURATED_CASE=exonic_motif_pkhd1;CLINVAR_VARIATION_ID=558073	GT	0/1
+chr7	23144030	VCV000452804	G	C	.	PASS	CURATED_CASE=near_splice_klhl7;CLINVAR_VARIATION_ID=452804	GT	0/1
+chr8	86605416	VCV000635822	C	T	.	PASS	CURATED_CASE=deep_intronic_cngb3;CLINVAR_VARIATION_ID=635822	GT	0/1
+chr11	5226820	VCV000015454	C	T	.	PASS	CURATED_CASE=proximal_intronic_hbb;CLINVAR_VARIATION_ID=15454	GT	0/1
+chr17	43115724	VCV000867519	T	A	.	PASS	CURATED_CASE=canonical_donor_brca1;CLINVAR_VARIATION_ID=867519	GT	0/1
