@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add a compact, read-only SLURM failure-bundle helper that excludes source data and large logs.
 - Raise the Kircherlab SLURM controller allocation to 32 GB and VEP/SpliceAI child allocations to 32 GB after the VEP 115.2 Conda solve exceeded the original controller memory limit.
 - Add a Kircherlab BRCA1 smoke-test SLURM helper using the verified account, partitions, Miniforge path, shared rule-environment prefix, and controller email notifications.
 - Add a read-only SLURM site-inspection helper for collecting controller configuration without copying individual diagnostic commands.

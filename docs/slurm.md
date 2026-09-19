@@ -82,3 +82,18 @@ reporting rules retain their smaller allocations.
 The helper is intentionally specific to this smoke test. Update it if the site
 account, partitions, paths, or sample change; the generic launcher above remains
 the interface for other sites and production runs.
+
+## Collecting a failure bundle
+
+To share a failed controller run without copying large data, create a compact
+diagnostic bundle from the repository root:
+
+```bash
+bash scripts/slurm/collect_job_diagnostics.sh 3326218
+```
+
+This creates `diagnostics/slurm-job-3326218/` with SLURM accounting, controller
+log tails, matching-log inventory, the generated run configuration, and Git
+state. It excludes VCFs, references, Conda environments, and full logs. Inspect
+the bundle before committing it because retained logs can include filesystem
+paths and sample identifiers.
