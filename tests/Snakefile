@@ -58,9 +58,20 @@ rule parse_all_vep:
         "--sample-id SYNTHETIC-1 --source-vcf synthetic.vcf.gz --source-manifest synthetic.json "
         "--annotation-version 115"
 
+rule annotate_categories:
+    input:
+        transcripts="tests/work/e2e/vep.transcripts.tsv.gz",
+        gtf="tests/data/GRCh38.mini.gtf"
+    output:
+        transcripts="tests/work/e2e/vep.transcripts.categorized.tsv.gz",
+        assignments="tests/work/e2e/category.assignments.tsv.gz"
+    shell:
+        "python3 workflow/scripts/annotate_splice_categories.py --input {input.transcripts} --gtf {input.gtf} "
+        "--output {output.transcripts} --assignments {output.assignments} --vep-release 115 --gtf-release 115 --assembly GRCh38"
+
 rule candidates:
     input:
-        vep="tests/work/e2e/vep.transcripts.tsv.gz",
+        vep="tests/work/e2e/vep.transcripts.categorized.tsv.gz",
         spliceai="tests/work/e2e/spliceai_evidence.tsv.gz",
         calls="tests/work/e2e/call_evidence.tsv.gz"
     output:
@@ -94,4 +105,5 @@ rule report:
         "--vep-version-file {input.vep_version} --spliceai-version-file {input.spliceai_version} "
         "--spliceai-mode local_unmasked --spliceai-max-distance 4999 --candidate-threshold 0.20 "
         "--review-threshold 0.05 --reference tests/data/GRCh38.mini.fa "
-        "--annotation tests/data/spliceai.grch38.mock.txt --config tests/config.test.yaml"
+        "--annotation tests/data/spliceai.grch38.mock.txt --category-gtf tests/data/GRCh38.mini.gtf "
+        "--category-release 115 --category-specification 1.0.0 --config tests/config.test.yaml"

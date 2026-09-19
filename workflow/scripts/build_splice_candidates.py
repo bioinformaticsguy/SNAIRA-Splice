@@ -75,7 +75,17 @@ def main() -> int:
             "source_manifest",
         ]
     )
-    transcript_fields += [*CALL_EVIDENCE_FIELDS, "splice_category", "candidate_reasons", *SPLICEAI_FIELDS]
+    transcript_fields += [
+        "category_set",
+        "category_assignment_status",
+        "category_assignment_reason",
+        "nearest_junction_distance",
+        "nearest_junction_type",
+        *CALL_EVIDENCE_FIELDS,
+        "splice_category",
+        "candidate_reasons",
+        *SPLICEAI_FIELDS,
+    ]
     variant_fields = (
         list(candidates[0])
         if candidates
@@ -98,6 +108,8 @@ def main() -> int:
             "any_canonical_transcript",
             "vep_consequence_union",
             "splice_category_union",
+            "category_set_union",
+            "primary_category",
             "highest_vep_impact",
             "spliceai_max",
             "spliceai_event",

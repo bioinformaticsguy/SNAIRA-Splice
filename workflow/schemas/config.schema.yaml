@@ -1,7 +1,7 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 type: object
 additionalProperties: false
-required: [manifests, output_root, reference, vep, spliceai, outputs, temporary_directory, resources, logging]
+required: [manifests, output_root, reference, vep, spliceai, categories, outputs, temporary_directory, resources, logging]
 properties:
   manifests:
     type: object
@@ -50,6 +50,14 @@ properties:
       masked: {type: boolean}
       candidate_threshold: {type: number, minimum: 0, maximum: 1}
       review_threshold: {type: number, minimum: 0, maximum: 1}
+  categories:
+    type: object
+    additionalProperties: false
+    required: [gtf, annotation_release, specification_version]
+    properties:
+      gtf: {type: string, minLength: 1}
+      annotation_release: {type: integer, minimum: 1}
+      specification_version: {const: "1.0.0"}
   outputs:
     type: object
     additionalProperties: false

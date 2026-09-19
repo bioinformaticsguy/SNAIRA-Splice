@@ -1,0 +1,7 @@
+##description: synthetic GRCh38-like annotation for category tests
+chr21	test	exon	10	12	.	+	.	gene_id "ENSG0001"; transcript_id "ENST0001";
+chr21	test	exon	20	22	.	+	.	gene_id "ENSG0001"; transcript_id "ENST0001";
+chr21	test	exon	30	32	.	-	.	gene_id "ENSG0002"; transcript_id "ENST0002";
+chr21	test	exon	40	42	.	-	.	gene_id "ENSG0002"; transcript_id "ENST0002";
+chr21	test	exon	50	52	.	+	.	gene_id "ENSG0003"; transcript_id "ENST0003";
+chr21	test	exon	300	302	.	+	.	gene_id "ENSG0003"; transcript_id "ENST0003";

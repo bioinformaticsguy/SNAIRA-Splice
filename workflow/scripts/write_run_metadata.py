@@ -37,6 +37,9 @@ def main() -> int:
     parser.add_argument("--spliceai-annotation", required=True, type=Path)
     parser.add_argument("--spliceai-mode", required=True)
     parser.add_argument("--spliceai-max-distance", required=True, type=int)
+    parser.add_argument("--category-gtf", required=True, type=Path)
+    parser.add_argument("--category-release", required=True, type=int)
+    parser.add_argument("--category-specification", required=True)
     args = parser.parse_args()
     git = subprocess.run(["git", "rev-parse", "HEAD"], text=True, capture_output=True, check=False)
     dirty = subprocess.run(["git", "status", "--porcelain"], text=True, capture_output=True, check=False)
@@ -54,6 +57,10 @@ def main() -> int:
         "spliceai_max_distance": args.spliceai_max_distance,
         "spliceai_annotation": str(args.spliceai_annotation),
         "spliceai_annotation_sha256": digest(args.spliceai_annotation),
+        "category_gtf": str(args.category_gtf),
+        "category_gtf_sha256": digest(args.category_gtf),
+        "category_annotation_release": args.category_release,
+        "category_specification": args.category_specification,
         "reference_assembly": args.assembly,
         "reference_fasta": str(args.reference),
         "reference_fasta_sha256": digest(args.reference),

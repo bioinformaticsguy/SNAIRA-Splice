@@ -42,6 +42,7 @@ rule all:
         expand(f"{OUT}/{{sample}}/04_summary/{{sample}}.splice_summary.html", sample=SAMPLES),
         expand(f"{OUT}/{{sample}}/03_spliceai/{{sample}}.spliceai.vcf.gz", sample=SAMPLES),
         expand(f"{OUT}/{{sample}}/03_spliceai/{{sample}}.spliceai_evidence.tsv.gz", sample=SAMPLES),
+        expand(f"{OUT}/{{sample}}/03_categories/{{sample}}.splice_category.assignments.tsv.gz", sample=SAMPLES),
         expand(f"{OUT}/{{sample}}/04_splice_candidates/{{sample}}.splice_candidates.transcripts.tsv.gz", sample=SAMPLES),
         expand(f"{OUT}/{{sample}}/04_splice_candidates/{{sample}}.splice_candidates.variants.tsv.gz", sample=SAMPLES),
         expand(f"{OUT}/{{sample}}/04_splice_candidates/{{sample}}.splice_review.variants.tsv.gz", sample=SAMPLES),

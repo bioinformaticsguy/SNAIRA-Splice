@@ -2,13 +2,13 @@
 
 ## Unreleased
 
+- Add release-matched GTF-backed transcript-relative splice categories, including exact intronic junction distances, non-exclusive canonical/near/exonic-motif/deep-intronic assignments, an atomic assignment table, candidate/report category fields, and boundary tests.
+- Add explicit `--download-gtf` resource setup support for the Ensembl GTF pinned to the VEP/cache release.
 - Correct VEP consequence parsing for both comma-separated tabular output and ampersand-separated CSQ-style terms, preventing missed canonical and splice-region annotations.
 - Add a documented, one-command cache-free synthetic workflow test using the committed fixture.
 - Add a one-command regional preflight that prepares the test VCF, dry-runs the DAG, and validates SLURM without submitting jobs.
 - Populate requested VEP tabular fields with the matching VEP output flags and correctly record unmasked SpliceAI mode in HTML provenance.
 - Retain normalized VCF call evidence (`GT`, `DP`, `GQ`, `AD`, `QUAL`, `FILTER`) in candidate tables and the standalone report.
-
-## Unreleased
 
 - Place new regional smoke-test outputs under the repository-local, git-ignored `output/results/` directory, allowing an existing result tree to be migrated intact.
 - Correct the SpliceAI 1.3.1 reporting-distance default to its supported maximum of 4999 bp; 5000 was rejected by the predictor CLI during the first real cluster run.

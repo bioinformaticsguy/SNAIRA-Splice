@@ -31,6 +31,11 @@ spliceai:
   masked: false
   candidate_threshold: 0.20
   review_threshold: 0.05
+categories:
+  # Must be Ensembl 115 to match VEP/cache release 115; do not use the shared release-113 GTF.
+  gtf: /data/humangen_kircherlab/Users/hassan/resources/SNAIRA-Splice/annotation/Homo_sapiens.GRCh38.115.gtf.gz
+  annotation_release: 115
+  specification_version: "1.0.0"
 outputs:
   vep_vcf: true
   vep_tabular: true

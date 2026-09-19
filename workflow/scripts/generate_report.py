@@ -69,8 +69,8 @@ def summary_metrics(
         "canonical_acceptor_variants": sum(
             "canonical_acceptor" in row.get("splice_category_union", "").split(";") for row in candidates
         ),
-        "splice_region_variants": sum(
-            "splice_region" in row.get("splice_category_union", "").split(";") for row in candidates
+        "near_splice_variants": sum(
+            "near_splice" in row.get("category_set_union", "").split(";") for row in candidates
         ),
         "spliceai_ge_candidate": sum(value is not None and value >= candidate_threshold for value in maxima.values()),
         "spliceai_ge_0_50": sum(value is not None and value >= 0.50 for value in maxima.values()),
@@ -123,7 +123,9 @@ def _transcript_details(rows: list[dict[str, str]]) -> str:
             f"<td>{html.escape(row.get('symbol', '') or row.get('spliceai_gene', '') or '—')}</td>"
             f"<td>{html.escape(row.get('biotype', '') or '—')}</td>"
             f"<td>{html.escape(row.get('consequence', '') or '—')}</td>"
-            f"<td>{html.escape(row.get('splice_category', '') or '—')}</td>"
+            f"<td>{html.escape(row.get('category_set', '') or row.get('splice_category', '') or '—')}</td>"
+            f"<td>{html.escape(row.get('category_assignment_status', '') or '—')}</td>"
+            f"<td>{html.escape(_junction_detail(row))}</td>"
             f"<td>{html.escape(row.get('mane_select', '') or '—')}</td>"
             f"<td>{html.escape(ds)}</td><td>{html.escape(dp)}</td>"
             f"<td>{html.escape(row.get('spliceai_status', '') or '—')}</td>"
@@ -131,10 +133,19 @@ def _transcript_details(rows: list[dict[str, str]]) -> str:
         )
     return (
         '<div class="table-wrap"><table class="detail-table"><thead><tr><th>Transcript</th><th>Gene</th>'
-        "<th>Biotype</th><th>VEP consequence</th><th>Category</th><th>MANE Select</th>"
+        "<th>Biotype</th><th>VEP consequence</th><th>Category</th><th>Category status</th><th>Nearest junction (bp)</th><th>MANE Select</th>"
         "<th>DS AG / AL / DG / DL</th><th>DP AG / AL / DG / DL</th><th>Status</th></tr></thead>"
         f"<tbody>{''.join(body)}</tbody></table></div>"
     )
+
+
+def _junction_detail(row: dict[str, str]) -> str:
+    """Format a nearest-junction distance while retaining the boundary type."""
+    distance = row.get("nearest_junction_distance", "")
+    boundary = row.get("nearest_junction_type", "")
+    if not distance:
+        return "—"
+    return f"{distance} ({boundary})" if boundary else distance
 
 
 def _variant_rows(rows: list[dict[str, str]], transcripts: dict[str, list[dict[str, str]]], table_name: str) -> str:
@@ -148,7 +159,7 @@ def _variant_rows(rows: list[dict[str, str]], transcripts: dict[str, list[dict[s
             if row.get("any_mane_select") == "yes"
             else "no"
         )
-        category = row.get("splice_category_union", "") or "other"
+        category = row.get("category_set_union", "") or row.get("splice_category_union", "") or "other"
         search = " ".join(
             (
                 row.get("normalized_variant_id", ""),
@@ -252,7 +263,7 @@ th,td{{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vert
 <main><div class="notice"><strong>Research use:</strong> Computational splice predictions are research evidence and do not demonstrate that an RNA splicing event occurs. Scores are not pathogenic/benign classifications.</div>
 <h2>Summary</h2><div class="cards">{cards}</div>
 <h2>Main candidates</h2><p>Retained by VEP donor/acceptor/splice-region consequence or SpliceAI ≥ {candidate_threshold:g}.</p>
-<div class="controls" data-for="candidate-table"><input class="search" type="search" placeholder="Search all fields"><input class="gene-filter" type="search" placeholder="Filter gene"><input class="consequence-filter" type="search" placeholder="Filter VEP consequence"><select class="category-filter"><option value="">All categories</option><option>canonical_donor</option><option>canonical_acceptor</option><option>splice_region</option><option>intronic_noncanonical</option><option>exonic_noncanonical</option><option>other</option></select><label>Minimum SpliceAI <input class="threshold" type="number" min="0" max="1" step="0.05" value="0"></label><label><input class="mane-filter" type="checkbox"> MANE only</label></div>
+<div class="controls" data-for="candidate-table"><input class="search" type="search" placeholder="Search all fields"><input class="gene-filter" type="search" placeholder="Filter gene"><input class="consequence-filter" type="search" placeholder="Filter VEP consequence"><select class="category-filter"><option value="">All categories</option><option>canonical</option><option>near_splice</option><option>exonic_splicing_motif</option><option>deep_intronic</option></select><label>Minimum SpliceAI <input class="threshold" type="number" min="0" max="1" step="0.05" value="0"></label><label><input class="mane-filter" type="checkbox"> MANE only</label></div>
 <div class="table-wrap"><table id="candidate-table"><thead><tr>{headers}</tr></thead><tbody>{_variant_rows(candidates, by_variant, 'candidate')}</tbody></table><p class="empty" hidden>No variants match these filters.</p></div>
 <h2>Review dataset</h2><p>All scored variants with SpliceAI ≥ {review_threshold:g}; this includes main candidates and the lower review zone.</p>
 <div class="controls" data-for="review-table"><input class="search" type="search" placeholder="Search all fields"><input class="gene-filter" type="search" placeholder="Filter gene"><input class="consequence-filter" type="search" placeholder="Filter VEP consequence"><label>Minimum SpliceAI <input class="threshold" type="number" min="0" max="1" step="0.05" value="{review_threshold:g}"></label></div>
@@ -292,6 +303,9 @@ def main() -> int:
     parser.add_argument("--review-threshold", required=True, type=float)
     parser.add_argument("--reference", required=True, type=Path)
     parser.add_argument("--annotation", required=True)
+    parser.add_argument("--category-gtf", required=True, type=Path)
+    parser.add_argument("--category-release", required=True, type=int)
+    parser.add_argument("--category-specification", required=True)
     parser.add_argument("--config-checksum", required=True)
     args = parser.parse_args()
     commit, dirty = git_state()
@@ -310,6 +324,10 @@ def main() -> int:
         "spliceai_masked": is_masked_spliceai_mode(args.spliceai_mode),
         "spliceai_annotation": args.annotation,
         "spliceai_annotation_sha256": sha256(annotation_path),
+        "category_gtf": str(args.category_gtf),
+        "category_gtf_sha256": sha256(args.category_gtf),
+        "category_annotation_release": args.category_release,
+        "category_specification": args.category_specification,
         "reference_path": str(args.reference),
         "reference_sha256": sha256(args.reference),
         "config_sha256": args.config_checksum,

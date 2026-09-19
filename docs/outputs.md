@@ -9,6 +9,8 @@ All paths are beneath configured `output_root`.
 - `{sample}/02_vep/`: retained annotated VCF/TBI, explicit transcript TSV, HTML statistics, and VEP version text.
 - `{sample}/03_spliceai/{sample}.spliceai.vcf.gz`: raw local SpliceAI annotation and TBI.
 - `{sample}/03_spliceai/{sample}.spliceai_evidence.tsv.gz`: one row per allele/gene prediction, including all DS/DP values, tied events, predicted positions, status, and missing reason.
+- `{sample}/03_categories/{sample}.vep.transcripts.categorized.tsv.gz`: the complete parsed VEP transcript table augmented with transcript-aware category fields from the release-matched Ensembl GTF.
+- `{sample}/03_categories/{sample}.splice_category.assignments.tsv.gz`: normalized allele × transcript × category assignments. Empty `category` rows explicitly retain assignments outside the frozen v1.0 categories rather than silently dropping them.
 - `{sample}/04_splice_candidates/{sample}.splice_candidates.transcripts.tsv.gz`: joined candidate evidence at normalized allele × transcript granularity (with transcript-less rows when only unmatched SpliceAI gene evidence exists).
 - `{sample}/04_splice_candidates/{sample}.splice_candidates.variants.tsv.gz`: deterministic one-row-per-allele main candidate table.
 - `{sample}/04_splice_candidates/{sample}.splice_review.variants.tsv.gz`: broader allele table meeting the review score threshold.
@@ -30,10 +32,13 @@ Stable transcript-table columns are grouped as follows:
 - transcript: `SYMBOL`, `Gene`, `Feature`, `BIOTYPE`, `STRAND`, `EXON`, `INTRON`, `HGVSc`, `HGVSp`;
 - quality: `MANE_SELECT`, `MANE_PLUS_CLINICAL`, `CANONICAL`, `TSL`, `APPRIS`;
 - VEP: `Consequence`, `IMPACT`, `splice_category`;
+- category assignment: `category_set`, `category_assignment_status`, `category_assignment_reason`, `nearest_junction_distance`, `nearest_junction_type`;
 - call evidence from the normalized VCF: `vcf_qual`, `vcf_filter`, `genotype`, `read_depth`, `genotype_quality`, `allele_depth`;
 - SpliceAI: `DS_AG`, `DS_AL`, `DS_DG`, `DS_DL`, `DP_AG`, `DP_AL`, `DP_DG`, `DP_DL`, `SpliceAI_max`, `SpliceAI_event`, `predicted_site_position`, `spliceai_status`, `spliceai_missing_reason`;
 - provenance: annotation version, source VCF, and source manifest.
 
 Semicolon-separated values in collapsed output represent unions, not a claim that every transcript has every listed effect. Missing scores are empty with a nonempty status/reason where determinable; a scored value of `0` is written as `0`.
+
+`category_set` implements `TSG-SPLICE-CATEGORIES/1.0.0` without forced mutual exclusivity. It may contain `canonical`, `near_splice`, `exonic_splicing_motif`, and/or `deep_intronic` as applicable to that exact allele × transcript. `nearest_junction_distance` is the minimum whole-base distance to the flanking intron boundary for wholly intronic alleles; `nearest_junction_type` is transcript-strand-aware (`donor`, `acceptor`, or both). `category_assignment_reason` records VEP/GTF evidence and the intentional v1.0 proximal-intronic 9–100 bp gap. The collapsed candidate table retains `category_set_union` plus `primary_category`, a display-only precedence value; neither removes transcript-level assignments.
 
 `genotype`, `read_depth`, `genotype_quality`, and `allele_depth` preserve the source normalized VCF's `GT`, `DP`, `GQ`, and `AD` values respectively. Empty values mean the relevant VCF field was absent or missing; they are not converted to zero. `vcf_qual` and `vcf_filter` retain the raw normalized VCF `QUAL` and `FILTER` values.

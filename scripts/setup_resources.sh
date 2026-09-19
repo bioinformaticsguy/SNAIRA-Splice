@@ -10,6 +10,7 @@ Usage: setup_resources.sh [options]
   --species NAME                Species (default: homo_sapiens)
   --download-reference          Install reference FASTA, faidx, and dictionary
   --download-vep-cache          Install the offline VEP cache
+  --download-gtf                Install the Ensembl GRCh38 GTF matching VEP/cache release
   --install-software            Create the pinned VEP Conda environment separately
   --install-spliceai            Install pinned SpliceAI software and copy its GRCh38 annotation
   --force                       Replace an existing completed requested resource
@@ -23,6 +24,7 @@ vep_version="115"
 species="homo_sapiens"
 download_reference=false
 download_cache=false
+download_gtf=false
 install_software=false
 install_spliceai=false
 force=false
@@ -34,6 +36,7 @@ while (($#)); do
     --species) species="${2:?missing value}"; shift 2 ;;
     --download-reference) download_reference=true; shift ;;
     --download-vep-cache) download_cache=true; shift ;;
+    --download-gtf) download_gtf=true; shift ;;
     --install-software) install_software=true; shift ;;
     --install-spliceai) install_spliceai=true; shift ;;
     --force) force=true; shift ;;
@@ -43,9 +46,9 @@ while (($#)); do
 done
 [[ "$assembly" == "GRCh38" ]] || { echo "ERROR: only GRCh38 is supported" >&2; exit 2; }
 [[ "$vep_version" == "115" ]] || { echo "ERROR: this release pins VEP 115.2 and requires cache release 115" >&2; exit 2; }
-$download_reference || $download_cache || $install_software || $install_spliceai || { echo "ERROR: select at least one action" >&2; usage >&2; exit 2; }
+$download_reference || $download_cache || $download_gtf || $install_software || $install_spliceai || { echo "ERROR: select at least one action" >&2; usage >&2; exit 2; }
 command -v sha256sum >/dev/null || { echo "ERROR: required command not found: sha256sum" >&2; exit 1; }
-if $download_reference || $download_cache; then
+if $download_reference || $download_cache || $download_gtf; then
   for command in curl sum; do command -v "$command" >/dev/null || { echo "ERROR: required command not found: $command" >&2; exit 1; }; done
 fi
 
@@ -82,6 +85,25 @@ verify_ensembl_checksum() {
     echo "WARNING: Ensembl CHECKSUMS unavailable; retaining recorded SHA-256" >&2
   fi
 }
+
+if $download_gtf; then
+  annotation_dir="$resource_dir/annotation"
+  gtf="$annotation_dir/Homo_sapiens.${assembly}.${vep_version}.gtf.gz"
+  marker="$annotation_dir/.Homo_sapiens.${assembly}.${vep_version}.gtf.complete"
+  gtf_url="https://ftp.ensembl.org/pub/release-${vep_version}/gtf/homo_sapiens/Homo_sapiens.${assembly}.${vep_version}.gtf.gz"
+  if [[ -f "$marker" ]] && ! $force; then
+    echo "Matching Ensembl GTF already complete: $gtf"
+  else
+    mkdir -p "$annotation_dir"
+    downloaded="$temporary_dir/Homo_sapiens.${assembly}.${vep_version}.gtf.gz"
+    curl --fail --location --retry 5 --output "$downloaded" "$gtf_url"
+    verify_ensembl_checksum "$gtf_url" "$downloaded"
+    gzip -t "$downloaded"
+    mv "$downloaded" "$gtf"
+    record_resource ensembl_gtf "$vep_version" "$gtf" "$gtf_url"
+    date -u +%FT%TZ > "$marker"
+  fi
+fi
 
 if $install_software; then
   command -v conda >/dev/null || { echo "ERROR: conda is required for --install-software" >&2; exit 1; }

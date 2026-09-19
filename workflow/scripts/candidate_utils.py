@@ -6,7 +6,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from typing import Any
 
-from splice_utils import IMPACT_ORDER, consequence_terms, transcript_rank, truthy_flag
+from splice_utils import IMPACT_ORDER, canonical_splice_type, consequence_terms, transcript_rank, truthy_flag
 from spliceai_utils import strongest_rows
 
 SPLICEAI_FIELDS = [
@@ -51,6 +51,19 @@ def coarse_categories(consequence: str, exon: str = "", intron: str = "") -> tup
         else:
             categories.append("other")
     return tuple(categories)
+
+
+def presentation_categories(row: dict[str, str]) -> tuple[str, ...]:
+    """Return display categories while retaining the v1.0 category set on the row."""
+    assigned = {value for value in row.get("category_set", "").split(";") if value}
+    if not assigned:
+        return coarse_categories(row.get("consequence", ""), row.get("exon", ""), row.get("intron", ""))
+    if "canonical" in assigned:
+        assigned.remove("canonical")
+        subtype = canonical_splice_type(row.get("consequence", ""))
+        if subtype:
+            assigned.add(f"canonical_{subtype}")
+    return tuple(sorted(assigned))
 
 
 def variant_vep_flags(rows: Iterable[dict[str, str]]) -> tuple[bool, bool, bool]:
@@ -128,6 +141,15 @@ def _best_spliceai(rows: list[dict[str, str]]) -> tuple[str, str, str, str, str]
     )
 
 
+def _primary_category(rows: list[dict[str, str]]) -> str:
+    """Return the documented display-only category precedence without erasing overlaps."""
+    categories = {category for row in rows for category in row.get("category_set", "").split(";") if category}
+    for category in ("canonical", "near_splice", "exonic_splicing_motif", "deep_intronic"):
+        if category in categories:
+            return category
+    return ""
+
+
 def join_candidate_rows(
     vep_rows: list[dict[str, str]],
     spliceai_rows: list[dict[str, str]],
@@ -165,9 +187,7 @@ def join_candidate_rows(
                 row = dict(vep)
                 call = calls_by_variant.get(variant_id, {})
                 row.update({field: call.get(field, "") for field in CALL_EVIDENCE_FIELDS})
-                row["splice_category"] = ";".join(
-                    coarse_categories(vep.get("consequence", ""), vep.get("exon", ""), vep.get("intron", ""))
-                )
+                row["splice_category"] = ";".join(presentation_categories(row))
                 row["candidate_reasons"] = ";".join(reasons)
                 for field in SPLICEAI_FIELDS:
                     row[field] = ""
@@ -255,6 +275,10 @@ def collapse_variants(
             "splice_category_union": ";".join(
                 sorted({category for row in rows for category in row.get("splice_category", "").split(";") if category})
             ),
+            "category_set_union": ";".join(
+                sorted({category for row in rows for category in row.get("category_set", "").split(";") if category})
+            ),
+            "primary_category": _primary_category(rows),
             "highest_vep_impact": impacts[0] if impacts else "",
             "spliceai_max": maximum,
             "spliceai_event": events,

@@ -9,7 +9,7 @@ Every adapter should emit a compressed TSV with these columns:
 | `variant_key` | normalized `CHROM:POS:REF:ALT` |
 | `sample_id` | manifest sample |
 | `gene` / `transcript` | tool-specific mapped context, nullable |
-| `variant_class` | canonical, near_splice, exonic_motif, or deep_intronic |
+| `variant_class` | canonical, near_splice, exonic_splicing_motif, or deep_intronic |
 | `predictor_name` / `predictor_version` | provenance |
 | `raw_score` / `normalized_score` | original and harmonized values |
 | `prediction_label` | tool-defined categorical call |
@@ -18,6 +18,6 @@ Every adapter should emit a compressed TSV with these columns:
 | `evidence_source` | model/database/source description |
 | `missing_value_reason` | explicit reason when an applicable value is absent |
 
-Applicability belongs in configuration and metadata, not inference from missing scores. A module declares one or more of `canonical`, `near_splice`, `exonic_motif`, and `deep_intronic`; rows outside applicability should not be scored. Integration should preserve multiple predictors and contexts rather than overwriting them. The existing noncanonical splice-region table is the natural input boundary for a near-splice module.
+Applicability belongs in configuration and metadata, not inference from missing scores. A module declares one or more of `canonical`, `near_splice`, `exonic_splicing_motif`, and `deep_intronic`; rows outside applicability should not be scored. Integration should preserve multiple predictors and contexts rather than overwriting them. The `03_categories` atomic assignment table is the natural interface for selecting category-applicable rows while retaining all transcript assignments.
 
 An adapter must distinguish at least `scored`, `not_scored`, `unsupported_variant`, and a failed predictor job. It must preserve native fields before harmonization, define tie behavior, and document coordinate semantics. Adding Pangolin or SQUIRLS later should extend the evidence vector and report rather than replace `SpliceAI_max` or manufacture cross-tool equivalence.

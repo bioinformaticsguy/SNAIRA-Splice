@@ -195,6 +195,17 @@ def test_transcript_to_variant_collapse_preserves_strongest_effect() -> None:
     assert "intronic_noncanonical" in variants[0]["splice_category_union"]
 
 
+def test_variant_collapse_preserves_category_overlap_and_display_precedence() -> None:
+    first = vep("splice_region_variant&missense_variant", position=199, exon="1/2")
+    first.update({"category_set": "exonic_splicing_motif;near_splice"})
+    second = vep("splice_donor_variant", position=199, exon="1/2")
+    second.update({"category_set": "canonical;exonic_splicing_motif"})
+    transcripts = join_candidate_rows([first, second], [prediction(0.8, position=199)], 0.20)
+    variants, _ = collapse_variants(transcripts, [prediction(0.8, position=199)], 0.05)
+    assert variants[0]["category_set_union"] == "canonical;exonic_splicing_motif;near_splice"
+    assert variants[0]["primary_category"] == "canonical"
+
+
 def test_html_generation_contains_controls_evidence_and_disclaimer() -> None:
     sai = prediction(0.8)
     transcripts = join_candidate_rows([vep("splice_acceptor_variant")], [sai], 0.20)
@@ -213,6 +224,7 @@ def test_html_generation_contains_controls_evidence_and_disclaimer() -> None:
     assert "Search all fields" in report
     assert "Filter VEP consequence" in report
     assert "DS AG / AL / DG / DL" in report
+    assert "Category status" in report
     assert "splice_acceptor_variant" in report
     assert "Normalized VCF call" in report
     assert "Provenance" in report

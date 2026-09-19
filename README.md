@@ -14,7 +14,7 @@ The main candidate set is deliberately inclusive: VEP donor, acceptor, or splice
 
 ## Quick start
 
-Required biological inputs are a small-variant VCF, sample ID, matching GRCh38 FASTA, Ensembl VEP cache, SpliceAI installation/models, and a GRCh38 SpliceAI gene annotation. Create the development environment, then install the large resources explicitly:
+Required biological inputs are a small-variant VCF, sample ID, matching GRCh38 FASTA, Ensembl VEP cache, SpliceAI installation/models, a GRCh38 SpliceAI gene annotation, and an Ensembl GRCh38 GTF from the **same release as the VEP cache**. Create the development environment, then install the large resources explicitly:
 
 ## Layout
 
@@ -43,10 +43,11 @@ bash scripts/setup_resources.sh \
   --species homo_sapiens \
   --download-reference \
   --download-vep-cache \
+  --download-gtf \
   --install-spliceai
 ```
 
-Set `reference.*`, `vep.cache_dir`, and `spliceai.annotation` in `config/config.yaml`. To run one sample without writing a manifest yourself:
+Set `reference.*`, `vep.cache_directory`, `spliceai.annotation`, and `categories.gtf` in `config/config.yaml`. The category rule rejects mismatched GTF/VEP releases. To run one sample without writing a manifest yourself:
 
 ```bash
 python scripts/run_snaira_splice.py \
@@ -174,7 +175,7 @@ That command is useful only after changing the test reference/cache to compatibl
 - Multi-sample VCFs are recorded and accepted, but outputs remain keyed by manifest sample; genotype-level subsetting is not performed.
 - VEP is run twice (VCF and tabular modes) to keep both native trace output and explicit stable transcript columns.
 - SpliceAI's configured maximum distance is a model/reporting window, not evidence that every event in that window is biologically meaningful. SpliceAI 1.3.1 accepts values through 4999 bp; this is the default approximately 5 kb window.
-- Exact transcript-relative distance to exon boundaries is not yet calculated. Noncanonical intronic rows are therefore labelled `intronic_noncanonical`, never automatically `deep_intronic`.
+- Transcript-aware category calculation requires a GTF whose Ensembl release exactly matches the VEP cache. The workflow fails clearly rather than silently using a different release. Intronic alleles 9–100 bp from the nearest junction intentionally remain `outside_v1_categories` under the frozen v1.0 specification; they are not labelled `deep_intronic`.
 - SpliceAI 1.3.1 supports SNVs and simple indels subject to its own input constraints; unsupported alleles and absent annotations are reported distinctly.
 - Ensembl cache availability and MANE/TSL content depend on the pinned release and transcript set.
 - This is research software, not a pathogenicity classifier or clinical diagnostic system.

@@ -9,7 +9,8 @@ rule standalone_splice_report:
         vep_version=f"{OUT}/{{sample}}/02_vep/{{sample}}.vep.stats.txt",
         spliceai_version=f"{OUT}/{{sample}}/03_spliceai/{{sample}}.spliceai.version.txt",
         reference=config["reference"]["fasta"],
-        annotation=config["spliceai"]["annotation"]
+        annotation=config["spliceai"]["annotation"],
+        category_gtf=config["categories"]["gtf"]
     output: f"{OUT}/{{sample}}/05_report/{{sample}}.snaira_splice.html"
     resources:
         mem_mb=config["resources"]["reporting"]["mem_mb"],
@@ -24,7 +25,9 @@ rule standalone_splice_report:
         distance=config["spliceai"]["max_distance"],
         candidate=config["spliceai"]["candidate_threshold"],
         review=config["spliceai"]["review_threshold"],
-        config_checksum=CONFIG_CHECKSUM
+        config_checksum=CONFIG_CHECKSUM,
+        category_release=config["categories"]["annotation_release"],
+        category_specification=config["categories"]["specification_version"]
     shell:
         "python workflow/scripts/generate_report.py --candidates {input.candidates:q} --review {input.review:q} "
         "--transcripts {input.transcripts:q} --spliceai-evidence {input.evidence:q} --output {output:q} "
@@ -33,6 +36,8 @@ rule standalone_splice_report:
         "--spliceai-version-file {input.spliceai_version:q} --spliceai-mode {params.mode:q} "
         "--spliceai-max-distance {params.distance} --candidate-threshold {params.candidate} "
         "--review-threshold {params.review} --reference {input.reference:q} --annotation {input.annotation:q} "
+        "--category-gtf {input.category_gtf:q} --category-release {params.category_release} "
+        "--category-specification {params.category_specification:q} "
         "--config-checksum {params.config_checksum:q} > {log:q} 2>&1"
 
 rule sample_summary:
@@ -77,7 +82,8 @@ rule run_metadata:
         reference=config["reference"]["fasta"],
         vep_stats=expand(f"{OUT}/{{sample}}/02_vep/{{sample}}.vep.stats.txt", sample=SAMPLES),
         spliceai_versions=expand(f"{OUT}/{{sample}}/03_spliceai/{{sample}}.spliceai.version.txt", sample=SAMPLES),
-        annotation=config["spliceai"]["annotation"]
+        annotation=config["spliceai"]["annotation"],
+        category_gtf=config["categories"]["gtf"]
     output: f"{OUT}/metadata/run_metadata.json"
     conda: "../envs/python.yaml"
     log: f"{OUT}/metadata/run_metadata.log"
@@ -88,7 +94,9 @@ rule run_metadata:
         pipeline_version=PIPELINE_VERSION,
         config_checksum=CONFIG_CHECKSUM,
         spliceai_mode="local_masked" if config["spliceai"]["masked"] else "local_unmasked",
-        spliceai_distance=config["spliceai"]["max_distance"]
+        spliceai_distance=config["spliceai"]["max_distance"],
+        category_release=config["categories"]["annotation_release"],
+        category_specification=config["categories"]["specification_version"]
     shell:
         "python workflow/scripts/write_run_metadata.py --output {output:q} --config-checksum {params.config_checksum:q} "
         "--reference {input.reference:q} --resolved-samples {input.samples:q} --pipeline-version {params.pipeline_version:q} "
@@ -96,4 +104,6 @@ rule run_metadata:
         "--snakemake-version {params.snakemake_version:q} --vep-stats {input.vep_stats:q} "
         "--spliceai-version-files {input.spliceai_versions:q} --spliceai-annotation {input.annotation:q} "
         "--spliceai-mode {params.spliceai_mode:q} --spliceai-max-distance {params.spliceai_distance} "
+        "--category-gtf {input.category_gtf:q} --category-release {params.category_release} "
+        "--category-specification {params.category_specification:q} "
         "> {log:q} 2>&1"

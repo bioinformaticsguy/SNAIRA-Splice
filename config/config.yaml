@@ -29,6 +29,10 @@ spliceai:
   masked: false
   candidate_threshold: 0.20
   review_threshold: 0.05
+categories:
+  gtf: resources/annotation/Homo_sapiens.GRCh38.115.gtf.gz
+  annotation_release: 115
+  specification_version: "1.0.0"
 outputs:
   vep_vcf: true
   vep_tabular: true
