@@ -1,0 +1,5 @@
+sample_id	chrom	pos	ref	alt	normalized_variant_id	vcf_qual	vcf_filter	genotype	read_depth	genotype_quality	allele_depth
+SYNTHETIC-1	chr21	20	A	G	chr21:20:A:G	60	PASS	0/1	42	99	21,21
+SYNTHETIC-1	chr21	30	A	T	chr21:30:A:T	50	PASS	0/1	35	80	20,15
+SYNTHETIC-1	chr21	40	A	C	chr21:40:A:C	.	LowQual	1/1	18	45	1,17
+SYNTHETIC-1	chr21	50	A	G	chr21:50:A:G	70	PASS	0/1	""	""	""

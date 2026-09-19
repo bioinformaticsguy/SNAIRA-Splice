@@ -6,6 +6,7 @@
 - Add a documented, one-command cache-free synthetic workflow test using the committed fixture.
 - Add a one-command regional preflight that prepares the test VCF, dry-runs the DAG, and validates SLURM without submitting jobs.
 - Populate requested VEP tabular fields with the matching VEP output flags and correctly record unmasked SpliceAI mode in HTML provenance.
+- Retain normalized VCF call evidence (`GT`, `DP`, `GQ`, `AD`, `QUAL`, `FILTER`) in candidate tables and the standalone report.
 
 ## Unreleased
 

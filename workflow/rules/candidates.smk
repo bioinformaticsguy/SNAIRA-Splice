@@ -19,7 +19,8 @@ rule parse_all_vep_transcripts:
 rule build_splice_candidates:
     input:
         vep=f"{OUT}/{{sample}}/02_vep/{{sample}}.vep.transcripts.tsv.gz",
-        spliceai=f"{OUT}/{{sample}}/03_spliceai/{{sample}}.spliceai_evidence.tsv.gz"
+        spliceai=f"{OUT}/{{sample}}/03_spliceai/{{sample}}.spliceai_evidence.tsv.gz",
+        calls=f"{OUT}/{{sample}}/01_normalized/{{sample}}.call_evidence.tsv.gz"
     output:
         transcripts=f"{OUT}/{{sample}}/04_splice_candidates/{{sample}}.splice_candidates.transcripts.tsv.gz",
         variants=f"{OUT}/{{sample}}/04_splice_candidates/{{sample}}.splice_candidates.variants.tsv.gz",
@@ -34,7 +35,7 @@ rule build_splice_candidates:
         candidate=config["spliceai"]["candidate_threshold"],
         review=config["spliceai"]["review_threshold"]
     shell:
-        "python workflow/scripts/build_splice_candidates.py --vep {input.vep:q} --spliceai {input.spliceai:q} "
+        "python workflow/scripts/build_splice_candidates.py --vep {input.vep:q} --spliceai {input.spliceai:q} --call-evidence {input.calls:q} "
         "--candidate-threshold {params.candidate} --review-threshold {params.review} "
         "--transcripts {output.transcripts:q} --variants {output.variants:q} --review {output.review:q} "
         "> {log:q} 2>&1"

@@ -8,7 +8,7 @@ import csv
 import gzip
 from pathlib import Path
 
-from candidate_utils import SPLICEAI_FIELDS, collapse_variants, join_candidate_rows
+from candidate_utils import CALL_EVIDENCE_FIELDS, SPLICEAI_FIELDS, collapse_variants, join_candidate_rows
 from io_utils import atomic_tsv
 
 
@@ -21,6 +21,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--vep", required=True, type=Path)
     parser.add_argument("--spliceai", required=True, type=Path)
+    parser.add_argument("--call-evidence", required=True, type=Path)
     parser.add_argument("--candidate-threshold", required=True, type=float)
     parser.add_argument("--review-threshold", required=True, type=float)
     parser.add_argument("--transcripts", required=True, type=Path)
@@ -29,10 +30,14 @@ def main() -> int:
     args = parser.parse_args()
     if not 0 <= args.review_threshold <= args.candidate_threshold <= 1:
         raise SystemExit("thresholds must satisfy 0 <= review_threshold <= candidate_threshold <= 1")
-    vep_rows, spliceai_rows = read_rows(args.vep), read_rows(args.spliceai)
-    transcripts = join_candidate_rows(vep_rows, spliceai_rows, args.candidate_threshold)
+    vep_rows, spliceai_rows, call_rows = read_rows(args.vep), read_rows(args.spliceai), read_rows(args.call_evidence)
+    transcripts = join_candidate_rows(vep_rows, spliceai_rows, args.candidate_threshold, call_evidence_rows=call_rows)
     review_transcripts = join_candidate_rows(
-        vep_rows, spliceai_rows, args.review_threshold, score_reason="spliceai_review_threshold"
+        vep_rows,
+        spliceai_rows,
+        args.review_threshold,
+        score_reason="spliceai_review_threshold",
+        call_evidence_rows=call_rows,
     )
     candidates, review = collapse_variants(
         transcripts, spliceai_rows, args.review_threshold, review_transcript_rows=review_transcripts
@@ -70,7 +75,7 @@ def main() -> int:
             "source_manifest",
         ]
     )
-    transcript_fields += ["splice_category", "candidate_reasons", *SPLICEAI_FIELDS]
+    transcript_fields += [*CALL_EVIDENCE_FIELDS, "splice_category", "candidate_reasons", *SPLICEAI_FIELDS]
     variant_fields = (
         list(candidates[0])
         if candidates
@@ -83,6 +88,7 @@ def main() -> int:
             "ref",
             "alt",
             "normalized_variant_id",
+            *CALL_EVIDENCE_FIELDS,
             "gene_symbols",
             "affected_transcript_count",
             "representative_transcript",

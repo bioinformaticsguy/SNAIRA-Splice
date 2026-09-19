@@ -5,7 +5,7 @@ All paths are beneath configured `output_root`.
 - `metadata/resolved_samples.tsv`: resolved immutable inputs and manifest hashes.
 - `metadata/manifest_validation.json`: cohort validation errors/warnings.
 - `{sample}/logs/input_validation/`: BGZF, header, sample, and contig checks.
-- `{sample}/01_normalized/`: split, left-aligned VCF, TBI, and bcftools stats.
+- `{sample}/01_normalized/`: split, left-aligned VCF, TBI, bcftools stats, and `*.call_evidence.tsv.gz`.
 - `{sample}/02_vep/`: retained annotated VCF/TBI, explicit transcript TSV, HTML statistics, and VEP version text.
 - `{sample}/03_spliceai/{sample}.spliceai.vcf.gz`: raw local SpliceAI annotation and TBI.
 - `{sample}/03_spliceai/{sample}.spliceai_evidence.tsv.gz`: one row per allele/gene prediction, including all DS/DP values, tied events, predicted positions, status, and missing reason.
@@ -30,7 +30,10 @@ Stable transcript-table columns are grouped as follows:
 - transcript: `SYMBOL`, `Gene`, `Feature`, `BIOTYPE`, `STRAND`, `EXON`, `INTRON`, `HGVSc`, `HGVSp`;
 - quality: `MANE_SELECT`, `MANE_PLUS_CLINICAL`, `CANONICAL`, `TSL`, `APPRIS`;
 - VEP: `Consequence`, `IMPACT`, `splice_category`;
+- call evidence from the normalized VCF: `vcf_qual`, `vcf_filter`, `genotype`, `read_depth`, `genotype_quality`, `allele_depth`;
 - SpliceAI: `DS_AG`, `DS_AL`, `DS_DG`, `DS_DL`, `DP_AG`, `DP_AL`, `DP_DG`, `DP_DL`, `SpliceAI_max`, `SpliceAI_event`, `predicted_site_position`, `spliceai_status`, `spliceai_missing_reason`;
 - provenance: annotation version, source VCF, and source manifest.
 
 Semicolon-separated values in collapsed output represent unions, not a claim that every transcript has every listed effect. Missing scores are empty with a nonempty status/reason where determinable; a scored value of `0` is written as `0`.
+
+`genotype`, `read_depth`, `genotype_quality`, and `allele_depth` preserve the source normalized VCF's `GT`, `DP`, `GQ`, and `AD` values respectively. Empty values mean the relevant VCF field was absent or missing; they are not converted to zero. `vcf_qual` and `vcf_filter` retain the raw normalized VCF `QUAL` and `FILTER` values.

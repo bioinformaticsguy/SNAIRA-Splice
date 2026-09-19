@@ -30,6 +30,7 @@ SPLICEAI_FIELDS = [
     "spliceai_status",
     "spliceai_missing_reason",
 ]
+CALL_EVIDENCE_FIELDS = ["vcf_qual", "vcf_filter", "genotype", "read_depth", "genotype_quality", "allele_depth"]
 
 
 def coarse_categories(consequence: str, exon: str = "", intron: str = "") -> tuple[str, ...]:
@@ -132,10 +133,14 @@ def join_candidate_rows(
     spliceai_rows: list[dict[str, str]],
     candidate_threshold: float,
     score_reason: str = "spliceai_candidate_threshold",
+    call_evidence_rows: list[dict[str, str]] | None = None,
 ) -> list[dict[str, str]]:
     """Create transcript evidence rows for alleles passing the candidate OR logic."""
     vep_by_variant: dict[str, list[dict[str, str]]] = defaultdict(list)
     sai_by_variant: dict[str, list[dict[str, str]]] = defaultdict(list)
+    calls_by_variant = {
+        row["normalized_variant_id"]: row for row in (call_evidence_rows or []) if row.get("normalized_variant_id")
+    }
     for row in vep_rows:
         vep_by_variant[row["normalized_variant_id"]].append(row)
     for row in spliceai_rows:
@@ -158,6 +163,8 @@ def join_candidate_rows(
                 matches = [(None, None)]
             for index, sai in matches:
                 row = dict(vep)
+                call = calls_by_variant.get(variant_id, {})
+                row.update({field: call.get(field, "") for field in CALL_EVIDENCE_FIELDS})
                 row["splice_category"] = ";".join(
                     coarse_categories(vep.get("consequence", ""), vep.get("exon", ""), vep.get("intron", ""))
                 )
@@ -186,6 +193,7 @@ def join_candidate_rows(
             row.update(
                 {"symbol": sai.get("gene", ""), "splice_category": "other", "candidate_reasons": ";".join(reasons)}
             )
+            row.update({field: calls_by_variant.get(variant_id, {}).get(field, "") for field in CALL_EVIDENCE_FIELDS})
             for field in SPLICEAI_FIELDS:
                 source_field = "gene" if field == "spliceai_gene" else field
                 row[field] = sai.get(source_field, "")
@@ -224,6 +232,7 @@ def collapse_variants(
             "ref": identity.get("ref", ""),
             "alt": identity.get("alt", ""),
             "normalized_variant_id": variant_id,
+            **{field: identity.get(field, "") for field in CALL_EVIDENCE_FIELDS},
             "gene_symbols": ";".join(
                 sorted(
                     {row.get("symbol", "") for row in rows if row.get("symbol")}

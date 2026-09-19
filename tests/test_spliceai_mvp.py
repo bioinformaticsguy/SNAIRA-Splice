@@ -214,6 +214,7 @@ def test_html_generation_contains_controls_evidence_and_disclaimer() -> None:
     assert "Filter VEP consequence" in report
     assert "DS AG / AL / DG / DL" in report
     assert "splice_acceptor_variant" in report
+    assert "Normalized VCF call" in report
     assert "Provenance" in report
 
 

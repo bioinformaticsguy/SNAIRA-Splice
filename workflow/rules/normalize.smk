@@ -25,3 +25,17 @@ rule normalize_vcf:
         "bcftools annotate --set-id '%CHROM:%POS:%REF:%ALT' --output-type z --output {output.vcf:q} >> {log:q} 2>&1 && "
         "tabix --preset vcf {output.vcf:q} >> {log:q} 2>&1 && "
         "bcftools stats {output.vcf:q} > {output.stats:q} 2>> {log:q}"
+
+
+rule extract_call_evidence:
+    input: f"{OUT}/{{sample}}/01_normalized/{{sample}}.normalized.vcf.gz"
+    output: f"{OUT}/{{sample}}/01_normalized/{{sample}}.call_evidence.tsv.gz"
+    resources:
+        mem_mb=config["resources"]["python"]["mem_mb"],
+        runtime=config["resources"]["python"]["runtime"]
+    conda: "../envs/python.yaml"
+    log: f"{OUT}/{{sample}}/logs/extract_call_evidence.log"
+    benchmark: f"{OUT}/{{sample}}/benchmarks/extract_call_evidence.tsv"
+    shell:
+        "python workflow/scripts/extract_call_evidence.py --input {input:q} --output {output:q} "
+        "--sample-id {wildcards.sample:q} > {log:q} 2>&1"

@@ -86,6 +86,30 @@ def _badge(value: str, css: str = "neutral") -> str:
     return f'<span class="badge {css}">{html.escape(value or "—")}</span>'
 
 
+def _call_summary(row: dict[str, str]) -> str:
+    """Return compact, raw call evidence suitable for the main candidate table."""
+    values = [
+        ("GT", row.get("genotype", "")),
+        ("DP", row.get("read_depth", "")),
+        ("GQ", row.get("genotype_quality", "")),
+    ]
+    return " · ".join(f"{label} {value}" for label, value in values if value) or "—"
+
+
+def _call_details(row: dict[str, str]) -> str:
+    """Return all retained raw VCF call evidence for a candidate detail panel."""
+    values = [
+        ("GT", row.get("genotype", "")),
+        ("DP", row.get("read_depth", "")),
+        ("GQ", row.get("genotype_quality", "")),
+        ("AD", row.get("allele_depth", "")),
+        ("QUAL", row.get("vcf_qual", "")),
+        ("FILTER", row.get("vcf_filter", "")),
+    ]
+    text = " · ".join(f"{label}: {value or '—'}" for label, value in values)
+    return f"<p><strong>Normalized VCF call:</strong> {html.escape(text)}</p>"
+
+
 def _transcript_details(rows: list[dict[str, str]]) -> str:
     if not rows:
         return "<p>No matching VEP transcript row was available for this SpliceAI gene prediction.</p>"
@@ -138,6 +162,7 @@ def _variant_rows(rows: list[dict[str, str]], transcripts: dict[str, list[dict[s
             f'data-consequence="{html.escape(row.get("vep_consequence_union", "").lower())}" data-category="{html.escape(category)}" '
             f'data-score="{html.escape(maximum)}" data-mane="{html.escape(mane)}">'
             f"<td>{html.escape(row.get('normalized_variant_id', ''))}</td>"
+            f"<td>{html.escape(_call_summary(row))}</td>"
             f"<td>{html.escape(row.get('gene_symbols', '') or '—')}</td>"
             f"<td>{html.escape(row.get('representative_transcript', '') or '—')}</td>"
             f"<td>{_badge(category, 'category')}</td>"
@@ -149,8 +174,9 @@ def _variant_rows(rows: list[dict[str, str]], transcripts: dict[str, list[dict[s
             f"<td>{html.escape(row.get('predicted_site_position', '') or '—')}</td>"
             f'<td><button type="button" class="detail-button" aria-expanded="false" data-target="{table_name}-detail-{index}">Inspect</button></td>'
             "</tr>"
-            f'<tr id="{table_name}-detail-{index}" class="detail-row" hidden><td colspan="11">'
+            f'<tr id="{table_name}-detail-{index}" class="detail-row" hidden><td colspan="12">'
             f"<p><strong>Retention:</strong> {html.escape(row.get('candidate_reasons', '') or 'review threshold')}</p>"
+            f"{_call_details(row)}"
             f"<p><strong>Strongest effects:</strong> {html.escape(row.get('spliceai_effects', '') or 'No scored prediction')}</p>"
             f"{_transcript_details(transcripts.get(row.get('normalized_variant_id', ''), []))}</td></tr>"
         )
@@ -192,6 +218,7 @@ def build_report(
         f'<th><button class="sort" type="button">{label}</button></th>'
         for label in [
             "Variant",
+            "Call",
             "Gene",
             "Representative transcript",
             "Region/category",

@@ -137,7 +137,7 @@ Normalization uses `bcftools norm -m -any -f ... --check-ref e`: multialleles ar
 
 ## Outputs
 
-Each sample retains normalized VCF, raw VEP outputs, a SpliceAI-annotated VCF, full parsed evidence, joined transcript candidates, collapsed allele candidates, a broader review table, and `{sample}.snaira_splice.html`. Legacy canonical-only tables and cohort summaries remain for compatibility. See [docs/outputs.md](docs/outputs.md).
+Each sample retains normalized VCF, raw VEP outputs, a SpliceAI-annotated VCF, full parsed evidence, joined transcript candidates, collapsed allele candidates, a broader review table, and `{sample}.snaira_splice.html`. Candidate tables and the report retain raw normalized-VCF call evidence (`GT`, `DP`, `GQ`, `AD`, `QUAL`, and `FILTER`) without interpreting missing values as zero. Legacy canonical-only tables and cohort summaries remain for compatibility. See [docs/outputs.md](docs/outputs.md).
 
 Representative transcript ordering is: MANE Plus Clinical, MANE Select, VEP canonical, protein coding, lower TSL, APPRIS principal, then lexical transcript ID. This selects a display representative only; all transcript rows remain available.
 

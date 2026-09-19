@@ -39,6 +39,11 @@ rule mock_spliceai_gzip:
     output: "tests/work/e2e/mock.spliceai.vcf.gz"
     shell: "gzip -c {input} > {output}"
 
+rule mock_call_evidence_gzip:
+    input: "tests/data/mock.call_evidence.tsv"
+    output: "tests/work/e2e/call_evidence.tsv.gz"
+    shell: "gzip -c {input} > {output}"
+
 rule parse_spliceai:
     input: "tests/work/e2e/mock.spliceai.vcf.gz"
     output: "tests/work/e2e/spliceai_evidence.tsv.gz"
@@ -56,13 +61,14 @@ rule parse_all_vep:
 rule candidates:
     input:
         vep="tests/work/e2e/vep.transcripts.tsv.gz",
-        spliceai="tests/work/e2e/spliceai_evidence.tsv.gz"
+        spliceai="tests/work/e2e/spliceai_evidence.tsv.gz",
+        calls="tests/work/e2e/call_evidence.tsv.gz"
     output:
         transcripts="tests/work/e2e/splice_candidates.transcripts.tsv.gz",
         variants="tests/work/e2e/splice_candidates.variants.tsv.gz",
         review="tests/work/e2e/splice_review.variants.tsv.gz"
     shell:
-        "python3 workflow/scripts/build_splice_candidates.py --vep {input.vep} --spliceai {input.spliceai} "
+        "python3 workflow/scripts/build_splice_candidates.py --vep {input.vep} --spliceai {input.spliceai} --call-evidence {input.calls} "
         "--candidate-threshold 0.20 --review-threshold 0.05 --transcripts {output.transcripts} "
         "--variants {output.variants} --review {output.review}"
 
