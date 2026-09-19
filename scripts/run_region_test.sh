@@ -4,19 +4,16 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: run_region_test.sh --vcf FILE --sample-id ID --reference FASTA --region REGION [options]
+Usage: run_region_test.sh [options]
 
 Extract and validate a small region from a source VCF, then optionally invoke
 the SNAIRA-Splice single-sample wrapper. The source VCF is never modified.
 
-Required:
-  --vcf FILE              Indexed source VCF (.vcf.gz with .tbi or .csi)
-  --sample-id ID          Sample name present in the source VCF
-  --reference FASTA       Matching reference FASTA, with .fai
-  --region REGION         Region accepted by bcftools, e.g. chr17:43000000-43200000
+The current cluster defaults select the checked-in 200 kb regional smoke test.
+Override any input below to run another sample or site.
 
 Options:
-  --config FILE           Site configuration (default: config/site.yaml)
+  --config FILE           Workflow configuration (default: config/cluster.yaml)
   --work-dir DIR          Derived input location (default: output/region-test-input/ID)
   --outdir DIR            Pipeline result root (default: output/results)
   --prepare-only          Create and validate the regional VCF (default)
@@ -29,12 +26,12 @@ EOF
 
 mode="prepare-only"
 force=false
-source_vcf=""
-sample_id=""
-reference_fasta=""
-region=""
+source_vcf="/data/humangen_sfb1665_seqdata/short_read/processed_data/phase_i/A4842_DNA_02/snv_calls/A4842_DNA_02.pass.vcf.gz"
+sample_id="A4842_DNA_02"
+reference_fasta="/data/humangen_kircherlab/Users/hassan/repos/VariantPiper/assets/reference/hg38.fa"
+region="chr17:43000000-43200000"
 repository="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-site_config="$repository/config/site.yaml"
+site_config="$repository/config/cluster.yaml"
 work_root=""
 output_root="$repository/output/results"
 
@@ -56,11 +53,6 @@ while (($#)); do
   esac
 done
 
-[[ -n "$source_vcf" && -n "$sample_id" && -n "$reference_fasta" && -n "$region" ]] || {
-  echo "ERROR: --vcf, --sample-id, --reference, and --region are required." >&2
-  usage >&2
-  exit 2
-}
 [[ "$sample_id" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "ERROR: unsafe sample ID: $sample_id" >&2; exit 2; }
 work_root="${work_root:-$repository/output/region-test-input/$sample_id}"
 test_vcf="$work_root/input/$sample_id.region.vcf.gz"

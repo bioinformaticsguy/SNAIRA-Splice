@@ -57,34 +57,27 @@ Monitor with your site's normal commands, commonly `squeue -u "$USER"`, `sacct -
 ## Regional smoke test
 
 Use a small region from a real sample to validate installed resources before a
-whole-genome run. First copy `config/site.example.yaml` to the git-ignored
-`config/site.yaml` and replace the placeholder paths. Then prepare a region;
-the source VCF remains immutable:
+whole-genome run. `config/cluster.yaml` contains the current shared-resource
+paths and `run_region_test.sh` defaults to the prepared smoke-test sample. The
+source VCF remains immutable:
 
 ```bash
-bash scripts/run_region_test.sh \
-  --vcf /absolute/path/sample.vcf.gz \
-  --sample-id S001 \
-  --reference /absolute/path/GRCh38.fa \
-  --region chr17:43000000-43200000 \
-  --dry-run
+bash scripts/run_region_test.sh --dry-run
 ```
 
-After copying and configuring the git-ignored local launcher described above,
-preflight or submit the generated run configuration:
+Preflight or submit the generated run configuration:
 
 ```bash
-bash scripts/slurm/submit_region_test.sh --sample-id S001 --preflight
-bash scripts/slurm/submit_region_test.sh --sample-id S001 --submit
+bash scripts/slurm/submit_region_test.sh --preflight
+bash scripts/slurm/submit_region_test.sh --submit
 ```
 
-Controller email is configured with `SNAIRA_MAIL_USER` in the local launcher.
-Child rule jobs do not request email independently, avoiding one notification
-stream per workflow rule. For first-time environment creation, a controller
-allocation of 64 GB is a reasonable starting point: Conda solving for the
-pinned VEP environment can be memory-intensive. The example site template
-allocates 32 GB each to VEP and SpliceAI; adjust these values from observed
-usage at your site.
+The regional helper requests controller email for all events. Child rule jobs
+do not request email independently, avoiding one notification stream per
+workflow rule. For first-time environment creation, its controller allocation
+is 64 GB: Conda solving for the pinned VEP environment can be memory-intensive.
+It allocates 32 GB each to VEP and SpliceAI; override the exported
+`SNAIRA_*` values when testing a different site or allocation.
 
 ## Collecting a failure bundle
 

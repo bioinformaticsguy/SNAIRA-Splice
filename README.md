@@ -58,26 +58,20 @@ python scripts/run_snaira_splice.py \
 
 The final report is `results/S001/05_report/S001.snaira_splice.html`. Use `--dry-run` to inspect the DAG. Existing multi-sample manifest execution remains supported below.
 
-For a real-resource regional smoke test, copy the generic site template and set
-only paths that are valid at your installation. The checked-in helper never
-modifies the source VCF:
+For the current cluster, `config/cluster.yaml` contains the verified shared
+resource paths and the regional helper defaults to the prepared real sample.
+The helper never modifies the source VCF:
 
 ```bash
-cp config/site.example.yaml config/site.yaml
-# Edit config/site.yaml, then:
-bash scripts/run_region_test.sh \
-  --vcf /absolute/path/sample.vcf.gz \
-  --sample-id S001 \
-  --reference /absolute/path/GRCh38.fa \
-  --region chr17:43000000-43200000 \
-  --dry-run
+bash scripts/run_region_test.sh --dry-run
 ```
 
 The smoke-test output root is `output/results/` inside the repository; for
 example, its report is `output/results/S001/05_report/S001.snaira_splice.html`.
-Generated files beneath `output/` and the local `config/site.yaml` are
-git-ignored. Use the SLURM controller described below for cluster execution
-rather than `--run-local` on a login node.
+Generated files beneath `output/` are git-ignored. Use the SLURM controller
+described below for cluster execution rather than `--run-local` on a login
+node. For another site or sample, override the VCF, sample ID, reference, and
+region options shown by `bash scripts/run_region_test.sh --help`.
 
 The ordinary workflow never downloads large data. The restartable setup command downloads to a temporary directory, validates archive structure, builds FASTA indexes/dictionary, records SHA-256 checksums and versions, and creates completion markers last. `--force` replaces a requested installed resource. VEP and SpliceAI are pinned in focused rule environments. `--install-software` and `--install-spliceai` can materialize those environments under the resource directory. No root or system installation is used. SpliceAI 1.3.1 has non-commercial use restrictions and its upstream repository is archived; review its license before use. See [docs/spliceai.md](docs/spliceai.md).
 

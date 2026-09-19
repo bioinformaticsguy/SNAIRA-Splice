@@ -1,4 +1,4 @@
-# Copy to config/site.yaml and replace every <...> value for your installation.
+# Current cluster configuration for the checked-in regional smoke test.
 # The single-sample wrapper overrides manifests.source and output_root per run.
 manifests:
   source: config/manifests.example.txt
@@ -7,11 +7,11 @@ manifests:
 output_root: output/results
 reference:
   assembly: GRCh38
-  fasta: <path-to-grch38-fasta>
-  fai: <path-to-grch38-fasta-index>
-  dictionary: <path-to-grch38-sequence-dictionary>
+  fasta: /data/humangen_kircherlab/Users/hassan/repos/VariantPiper/assets/reference/hg38.fa
+  fai: /data/humangen_kircherlab/Users/hassan/repos/VariantPiper/assets/reference/hg38.fa.fai
+  dictionary: /data/humangen_kircherlab/Users/hassan/resources/SNAIRA-Splice/reference/hg38.dict
 vep:
-  cache_directory: <path-to-vep-cache-root>
+  cache_directory: /data/humangen_kircherlab/Projects/VIPER-res/databases/vep
   cache_version: 115
   species: homo_sapiens
   assembly: GRCh38
@@ -25,7 +25,7 @@ vep:
   retain_all_transcript_consequences: true
 spliceai:
   enabled: true
-  annotation: <path-to-spliceai-grch38-annotation>
+  annotation: /data/humangen_kircherlab/Users/hassan/resources/SNAIRA-Splice/spliceai/grch38.txt
   # SpliceAI 1.3.1 accepts 0..4999; this is its largest supported window.
   max_distance: 4999
   masked: false
