@@ -86,6 +86,6 @@ rule report:
         "--transcripts {input.transcripts} --spliceai-evidence {input.evidence} --output {output} "
         "--sample-id SYNTHETIC-1 --assembly GRCh38 --pipeline-version test --run-date synthetic "
         "--vep-version-file {input.vep_version} --spliceai-version-file {input.spliceai_version} "
-        "--spliceai-mode local_unmasked --spliceai-max-distance 5000 --candidate-threshold 0.20 "
+        "--spliceai-mode local_unmasked --spliceai-max-distance 4999 --candidate-threshold 0.20 "
         "--review-threshold 0.05 --reference tests/data/GRCh38.mini.fa "
         "--annotation tests/data/spliceai.grch38.mock.txt --config tests/config.test.yaml"

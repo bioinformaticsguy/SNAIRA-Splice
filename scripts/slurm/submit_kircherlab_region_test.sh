@@ -55,7 +55,7 @@ account_args=()
 # Snakemake resolves and creates rule Conda environments in the controller.
 # The VEP environment solve exceeded 4 GB during the first cluster smoke test.
 sbatch --partition="$SNAIRA_SHORT_PARTITION" --time=3-00:00:00 --nodes=1 \
-  --cpus-per-task=2 --mem=32G --job-name=snaira-splice-controller \
+  --cpus-per-task=2 --mem=64G --job-name=snaira-splice-controller \
   --output=logs/%j_%u_%N_snaira_splice_controller.out \
   --error=logs/%j_%u_%N_snaira_splice_controller.err \
   "${account_args[@]}" "${mail_args[@]}" \

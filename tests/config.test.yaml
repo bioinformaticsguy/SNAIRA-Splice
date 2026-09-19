@@ -24,7 +24,7 @@ vep:
 spliceai:
   enabled: true
   annotation: tests/data/spliceai.grch38.mock.txt
-  max_distance: 5000
+  max_distance: 4999
   masked: false
   candidate_threshold: 0.20
   review_threshold: 0.05

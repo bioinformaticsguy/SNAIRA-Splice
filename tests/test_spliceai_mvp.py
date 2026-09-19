@@ -206,7 +206,7 @@ def test_html_generation_contains_controls_evidence_and_disclaimer() -> None:
         "run_date": "now",
         "vep_version": "115",
         "spliceai_mode": "local_unmasked",
-        "spliceai_max_distance": 5000,
+        "spliceai_max_distance": 4999,
     }
     report = build_report(variants, review, transcripts, [sai], metadata, 0.20, 0.05)
     assert "Computational splice predictions are research evidence" in report

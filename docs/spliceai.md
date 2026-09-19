@@ -12,13 +12,13 @@ The configured defaults are:
 spliceai:
   enabled: true
   annotation: resources/spliceai/grch38.txt
-  max_distance: 5000
+  max_distance: 4999
   masked: false
   candidate_threshold: 0.20
   review_threshold: 0.05
 ```
 
-`max_distance` controls SpliceAI's reporting window. It is not evidence that every predicted site within 5 kb is functional. Unmasked mode retains raw predictions for research/discovery review; masking can be enabled explicitly. Changing either setting changes interpretation and is recorded in provenance.
+`max_distance` controls SpliceAI's reporting window. SpliceAI 1.3.1 accepts an inclusive range of 0–4999, so `4999` is the largest supported approximately 5 kb reporting window; `5000` is rejected by its command-line parser. This is not evidence that every predicted site within that window is functional. Unmasked mode retains raw predictions for research/discovery review; masking can be enabled explicitly. Changing either setting changes interpretation and is recorded in provenance.
 
 ## Parsed evidence
 

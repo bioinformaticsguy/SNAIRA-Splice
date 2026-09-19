@@ -2,8 +2,9 @@
 
 ## Unreleased
 
+- Correct the SpliceAI 1.3.1 reporting-distance default to its supported maximum of 4999 bp; 5000 was rejected by the predictor CLI during the first real cluster run.
 - Add a compact, read-only SLURM failure-bundle helper that excludes source data and large logs.
-- Raise the Kircherlab SLURM controller allocation to 32 GB and VEP/SpliceAI child allocations to 32 GB after the VEP 115.2 Conda solve exceeded the original controller memory limit.
+- Raise the Kircherlab SLURM controller allocation to 64 GB and VEP/SpliceAI child allocations to 32 GB after the VEP 115.2 Conda solve exceeded the original controller memory limit.
 - Add a Kircherlab BRCA1 smoke-test SLURM helper using the verified account, partitions, Miniforge path, shared rule-environment prefix, and controller email notifications.
 - Add a read-only SLURM site-inspection helper for collecting controller configuration without copying individual diagnostic commands.
 - Add a checked-in Kircherlab resource configuration and reproducible BRCA1-region smoke-test helper to replace repeated interactive path exports.

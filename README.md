@@ -149,7 +149,7 @@ That command is useful only after changing the test reference/cache to compatibl
 - Mixed reference declarations in one run are unsupported.
 - Multi-sample VCFs are recorded and accepted, but outputs remain keyed by manifest sample; genotype-level subsetting is not performed.
 - VEP is run twice (VCF and tabular modes) to keep both native trace output and explicit stable transcript columns.
-- SpliceAI's configured maximum distance is a model/reporting window, not evidence that every event in that window is biologically meaningful.
+- SpliceAI's configured maximum distance is a model/reporting window, not evidence that every event in that window is biologically meaningful. SpliceAI 1.3.1 accepts values through 4999 bp; this is the default approximately 5 kb window.
 - Exact transcript-relative distance to exon boundaries is not yet calculated. Noncanonical intronic rows are therefore labelled `intronic_noncanonical`, never automatically `deep_intronic`.
 - SpliceAI 1.3.1 supports SNVs and simple indels subject to its own input constraints; unsupported alleles and absent annotations are reported distinctly.
 - Ensembl cache availability and MANE/TSL content depend on the pinned release and transcript set.

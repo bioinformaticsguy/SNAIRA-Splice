@@ -45,7 +45,8 @@ properties:
     properties:
       enabled: {const: true}
       annotation: {type: string, minLength: 1}
-      max_distance: {type: integer, minimum: 1, maximum: 10000}
+      # SpliceAI 1.3.1 CLI rejects 5000; its inclusive supported range ends at 4999.
+      max_distance: {type: integer, minimum: 1, maximum: 4999}
       masked: {type: boolean}
       candidate_threshold: {type: number, minimum: 0, maximum: 1}
       review_threshold: {type: number, minimum: 0, maximum: 1}
