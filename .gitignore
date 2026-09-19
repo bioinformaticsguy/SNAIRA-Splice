@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 results/
+output/*
 tests/work/
 resources/reference/
 resources/vep/
@@ -12,5 +13,7 @@ resources/resource_manifest.*
 logs/
 insp/
 scripts/slurm/submit_snaira_splice_controller.local.sh
+config/site.yaml
 !resources/.gitkeep
 !resources/README.md
+!output/.gitkeep

@@ -58,14 +58,26 @@ python scripts/run_snaira_splice.py \
 
 The final report is `results/S001/05_report/S001.snaira_splice.html`. Use `--dry-run` to inspect the DAG. Existing multi-sample manifest execution remains supported below.
 
-On the Kircherlab cluster, the verified shared-resource paths are collected in `config/kircherlab.cluster.yaml`. The checked-in regional smoke-test helper replaces the interactive path exports and never modifies the source VCF:
+For a real-resource regional smoke test, copy the generic site template and set
+only paths that are valid at your installation. The checked-in helper never
+modifies the source VCF:
 
 ```bash
-bash scripts/run_kircherlab_region_test.sh --prepare-only
-bash scripts/run_kircherlab_region_test.sh --dry-run
+cp config/site.example.yaml config/site.yaml
+# Edit config/site.yaml, then:
+bash scripts/run_region_test.sh \
+  --vcf /absolute/path/sample.vcf.gz \
+  --sample-id S001 \
+  --reference /absolute/path/GRCh38.fa \
+  --region chr17:43000000-43200000 \
+  --dry-run
 ```
 
-The site configuration is specific to Hassan's current cluster paths; update it deliberately if those resources move. Actual execution should use the SLURM controller described below rather than `--run-local` on a login node.
+The smoke-test output root is `output/results/` inside the repository; for
+example, its report is `output/results/S001/05_report/S001.snaira_splice.html`.
+Generated files beneath `output/` and the local `config/site.yaml` are
+git-ignored. Use the SLURM controller described below for cluster execution
+rather than `--run-local` on a login node.
 
 The ordinary workflow never downloads large data. The restartable setup command downloads to a temporary directory, validates archive structure, builds FASTA indexes/dictionary, records SHA-256 checksums and versions, and creates completion markers last. `--force` replaces a requested installed resource. VEP and SpliceAI are pinned in focused rule environments. `--install-software` and `--install-spliceai` can materialize those environments under the resource directory. No root or system installation is used. SpliceAI 1.3.1 has non-commercial use restrictions and its upstream repository is archived; review its license before use. See [docs/spliceai.md](docs/spliceai.md).
 
@@ -133,6 +145,17 @@ Representative transcript ordering is: MANE Plus Clinical, MANE Select, VEP cano
 ```bash
 bash scripts/run_test.sh
 ```
+
+For the fastest complete workflow check, use the committed synthetic dataset:
+
+```bash
+bash scripts/run_quick_test.sh
+```
+
+It needs no VEP cache or SpliceAI model and writes a disposable report to
+`tests/work/e2e/SYNTHETIC-1.snaira_splice.html`. See
+[`test_data/README.md`](test_data/README.md) for the fixture contents and its
+intentional limits.
 
 The test suite includes manifest/path failures, nested keys, combined SO terms, ranking, SpliceAI INFO parsing and missingness, candidate thresholds, collapse, HTML structure, and a cache-free Snakemake workflow driven by explicit mock VEP and SpliceAI annotations. Synthetic fixtures validate software behavior, not SpliceAI biology. A real integration run requires the full external resources:
 

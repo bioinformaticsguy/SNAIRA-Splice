@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from collections.abc import Iterable
 from typing import Any
@@ -11,8 +12,13 @@ IMPACT_ORDER = {"HIGH": 0, "MODERATE": 1, "LOW": 2, "MODIFIER": 3, "": 4}
 
 
 def consequence_terms(value: str | None) -> set[str]:
-    """Split VEP ampersand-delimited Sequence Ontology consequences."""
-    return {term.strip() for term in (value or "").split("&") if term.strip()}
+    """Split VEP comma- or ampersand-delimited Sequence Ontology terms.
+
+    VEP's CSQ field conventionally joins multiple terms with ``&``, whereas
+    tabular VEP output may use commas.  Treat both forms equivalently so the
+    same consequence logic is used for raw VEP VCF and tabular annotations.
+    """
+    return {term.strip() for term in re.split(r"[&,]", value or "") if term.strip()}
 
 
 def canonical_splice_type(value: str | None) -> str | None:

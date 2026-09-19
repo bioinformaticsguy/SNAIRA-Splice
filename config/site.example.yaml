@@ -1,18 +1,17 @@
-# Site configuration for the Kircherlab cluster. Use this through
-# scripts/run_kircherlab_region_test.sh or scripts/run_snaira_splice.py; the
-# single-sample wrapper replaces manifests.source and output_root per run.
+# Copy to config/site.yaml and replace every <...> value for your installation.
+# The single-sample wrapper overrides manifests.source and output_root per run.
 manifests:
   source: config/manifests.example.txt
   vcf_key: outputs.snv_pass_vcf
   index_key: outputs.snv_pass_vcf_index
-output_root: results
+output_root: output/results
 reference:
   assembly: GRCh38
-  fasta: /data/humangen_kircherlab/Users/hassan/repos/VariantPiper/assets/reference/hg38.fa
-  fai: /data/humangen_kircherlab/Users/hassan/repos/VariantPiper/assets/reference/hg38.fa.fai
-  dictionary: /data/humangen_kircherlab/Users/hassan/resources/SNAIRA-Splice/reference/hg38.dict
+  fasta: <path-to-grch38-fasta>
+  fai: <path-to-grch38-fasta-index>
+  dictionary: <path-to-grch38-sequence-dictionary>
 vep:
-  cache_directory: /data/humangen_kircherlab/Projects/VIPER-res/databases/vep
+  cache_directory: <path-to-vep-cache-root>
   cache_version: 115
   species: homo_sapiens
   assembly: GRCh38
@@ -26,7 +25,7 @@ vep:
   retain_all_transcript_consequences: true
 spliceai:
   enabled: true
-  annotation: /data/humangen_kircherlab/Users/hassan/resources/SNAIRA-Splice/spliceai/grch38.txt
+  annotation: <path-to-spliceai-grch38-annotation>
   # SpliceAI 1.3.1 accepts 0..4999; this is its largest supported window.
   max_distance: 4999
   masked: false
@@ -35,7 +34,7 @@ spliceai:
 outputs:
   vep_vcf: true
   vep_tabular: true
-temporary_directory: /data/humangen_kircherlab/Users/hassan/snaira-splice-runs/tmp
+temporary_directory: output/.tmp
 resources:
   normalize: {threads: 2, mem_mb: 4096, runtime: 60}
   vep: {threads: 4, mem_mb: 32768, runtime: 480}

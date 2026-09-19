@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: collect_job_diagnostics.sh JOB_ID [--output-dir DIR] [--tail-lines N]
+Usage: collect_job_diagnostics.sh JOB_ID [--output-dir DIR] [--tail-lines N] [--configfile FILE]
 
 Create a compact diagnostic bundle for a failed or completed SNAIRA-Splice
 controller job. The script is read-only with respect to workflow outputs: it
@@ -15,6 +15,7 @@ Arguments:
   JOB_ID                Numeric SLURM controller job ID
   --output-dir DIR      Bundle directory (default: diagnostics/slurm-job-JOB_ID)
   --tail-lines N        Lines retained from each matching log (default: 300)
+  --configfile FILE     Generated workflow config to copy, if available
   -h, --help            Show this help
 EOF
 }
@@ -28,6 +29,7 @@ shift
 
 output_dir="diagnostics/slurm-job-$job_id"
 tail_lines=300
+run_config=""
 while (($#)); do
   case "$1" in
     --output-dir) output_dir="${2:?missing value for --output-dir}"; shift 2 ;;
@@ -36,6 +38,7 @@ while (($#)); do
       [[ "$tail_lines" =~ ^[1-9][0-9]*$ ]] || { echo "ERROR: --tail-lines must be a positive integer" >&2; exit 2; }
       shift 2
       ;;
+    --configfile) run_config="${2:?missing value for --configfile}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "ERROR: unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
@@ -99,11 +102,14 @@ while IFS=$'\t' read -r _timestamp log_path; do
   } > "$bundle/log-${log_number}-${safe_name}.tail.txt"
 done < "$matching_logs"
 
-run_config="/data/humangen_kircherlab/Users/hassan/snaira-splice-runs/A4842_DNA_02_BRCA1/results/metadata/single_sample_input/A4842_DNA_02/config.yaml"
-if [[ -s "$run_config" ]]; then
+if [[ -z "$run_config" ]]; then
+  matches=(output/results/metadata/single_sample_input/*/config.yaml)
+  [[ ${#matches[@]} -eq 1 && -s "${matches[0]}" ]] && run_config="${matches[0]}"
+fi
+if [[ -n "$run_config" && -s "$run_config" ]]; then
   cp "$run_config" "$bundle/generated-run-config.yaml"
 else
-  printf 'Generated regional smoke-test config was not found: %s\n' "$run_config" > "$bundle/generated-run-config-missing.txt"
+  printf 'No generated run configuration was supplied or uniquely discovered.\n' > "$bundle/generated-run-config-missing.txt"
 fi
 
 find "$bundle" -maxdepth 1 -type f -printf '%f\n' | sort > "$bundle/contents.txt"

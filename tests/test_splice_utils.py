@@ -30,7 +30,9 @@ def base(**updates):
 
 def test_consequence_parsing() -> None:
     assert consequence_terms("missense_variant&splice_region_variant") == {"missense_variant", "splice_region_variant"}
+    assert consequence_terms("missense_variant,splice_region_variant") == {"missense_variant", "splice_region_variant"}
     assert canonical_splice_type("splice_donor_variant&intron_variant") == "donor"
+    assert canonical_splice_type("splice_donor_variant,NMD_transcript_variant") == "donor"
     assert canonical_splice_type("splice_acceptor_variant") == "acceptor"
     assert canonical_splice_type("splice_region_variant") is None
 

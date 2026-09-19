@@ -54,35 +54,37 @@ Controller logs are written under `logs/`; child-job logs use `logs/slurm/`. Bot
 
 Monitor with your site's normal commands, commonly `squeue -u "$USER"`, `sacct -j JOB_ID`, and the controller log. If a controller dies, fix the cause and resubmit: `rerun-incomplete` is enabled. Do not use `--forceall` against shared results. If Snakemake reports a stale lock only after confirming no controller is still active, run `snakemake --unlock` with the same configuration and working directory.
 
-## Kircherlab regional smoke test
+## Regional smoke test
 
-The checked-in Kircherlab helper contains the site values verified on
-2026-09-18: account `hassan`, `shortterm` for the controller and ordinary
-rules, `longterm` for VEP/SpliceAI, and the shared Miniforge and rule-environment
-prefixes. After preparing the regional test and generating its configuration,
-preflight and submit with:
+Use a small region from a real sample to validate installed resources before a
+whole-genome run. First copy `config/site.example.yaml` to the git-ignored
+`config/site.yaml` and replace the placeholder paths. Then prepare a region;
+the source VCF remains immutable:
 
 ```bash
-bash scripts/slurm/submit_kircherlab_region_test.sh --preflight
-bash scripts/slurm/submit_kircherlab_region_test.sh --submit
+bash scripts/run_region_test.sh \
+  --vcf /absolute/path/sample.vcf.gz \
+  --sample-id S001 \
+  --reference /absolute/path/GRCh38.fa \
+  --region chr17:43000000-43200000 \
+  --dry-run
 ```
 
-The controller submission requests SLURM mail type `ALL` for
-`alihassan1697@gmail.com`. Child rule jobs do not request email independently,
-which avoids one notification stream per workflow rule.
+After copying and configuring the git-ignored local launcher described above,
+preflight or submit the generated run configuration:
 
-The Kircherlab controller requests 64 GB of memory because Snakemake performs
-Conda dependency solving and creates rule environments in the controller
-process. A 4 GB controller was insufficient for resolving the pinned VEP 115.2
-environment during the first cluster smoke test, and the subsequent 32 GB
-controller peaked at approximately 30.9 GiB RSS. This memory is for workflow
-orchestration and environment creation. The Kircherlab smoke-test helper also
-requests 32 GB for each VEP and SpliceAI child job; lightweight parsing and
-reporting rules retain their smaller allocations.
+```bash
+bash scripts/slurm/submit_region_test.sh --sample-id S001 --preflight
+bash scripts/slurm/submit_region_test.sh --sample-id S001 --submit
+```
 
-The helper is intentionally specific to this smoke test. Update it if the site
-account, partitions, paths, or sample change; the generic launcher above remains
-the interface for other sites and production runs.
+Controller email is configured with `SNAIRA_MAIL_USER` in the local launcher.
+Child rule jobs do not request email independently, avoiding one notification
+stream per workflow rule. For first-time environment creation, a controller
+allocation of 64 GB is a reasonable starting point: Conda solving for the
+pinned VEP environment can be memory-intensive. The example site template
+allocates 32 GB each to VEP and SpliceAI; adjust these values from observed
+usage at your site.
 
 ## Collecting a failure bundle
 
@@ -90,7 +92,8 @@ To share a failed controller run without copying large data, create a compact
 diagnostic bundle from the repository root:
 
 ```bash
-bash scripts/slurm/collect_job_diagnostics.sh 3326218
+bash scripts/slurm/collect_job_diagnostics.sh 1234567 \
+  --configfile output/results/metadata/single_sample_input/S001/config.yaml
 ```
 
 This creates `diagnostics/slurm-job-3326218/` with SLURM accounting, controller
