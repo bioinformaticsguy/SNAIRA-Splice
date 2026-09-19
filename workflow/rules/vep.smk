@@ -7,6 +7,9 @@ VEP_FIELDS = ",".join([
     "STRAND", "FLAGS", "VARIANT_CLASS", "SYMBOL_SOURCE", "HGNC_ID", "CANONICAL", "MANE_SELECT",
     "MANE_PLUS_CLINICAL", "TSL", "APPRIS", "REF_ALLELE"
 ])
+# VEP only populates several requested tabular fields when their corresponding
+# output options are supplied. Keep this shared by VCF and tabular commands.
+VEP_OUTPUT_FLAGS = "--symbol --biotype --variant_class --hgvs --numbers --hgnc"
 
 VEP_ANNOTATION_FLAGS = []
 if config["vep"]["transcript_set"] == "refseq":
@@ -44,15 +47,16 @@ rule vep_annotate:
         cache=config["vep"]["cache_directory"], version=config["vep"]["cache_version"],
         species=config["vep"]["species"], assembly=config["vep"]["assembly"],
         fasta=config["reference"]["fasta"], flags=VEP_ANNOTATION_FLAGS, fields=VEP_FIELDS,
+        output_flags=VEP_OUTPUT_FLAGS,
         offline="--offline" if config["vep"]["offline"] else ""
     shell:
         "vep --input_file {input.vcf:q} --output_file STDOUT --vcf --compress_output bgzip --force_overwrite "
         "{params.offline} --cache --dir_cache {params.cache:q} --cache_version {params.version} "
         "--species {params.species:q} --assembly {params.assembly:q} --fasta {params.fasta:q} --fork {threads} "
-        "--symbol --biotype --variant_class --hgvs --numbers --hgnc --no_stats {params.flags} 2> {log:q} > {output.vcf:q} && "
+        "{params.output_flags} --no_stats {params.flags} 2> {log:q} > {output.vcf:q} && "
         "tabix --preset vcf {output.vcf:q} >> {log:q} 2>&1 && "
         "vep --input_file {input.vcf:q} --output_file STDOUT --tab --compress_output gzip --force_overwrite "
         "{params.offline} --cache --dir_cache {params.cache:q} --cache_version {params.version} "
         "--species {params.species:q} --assembly {params.assembly:q} --fasta {params.fasta:q} --fork {threads} "
-        "--fields {params.fields:q} --stats_file {output.html:q} {params.flags} 2>> {log:q} > {output.tsv:q} && "
+        "--fields {params.fields:q} {params.output_flags} --stats_file {output.html:q} {params.flags} 2>> {log:q} > {output.tsv:q} && "
         "vep --help 2>&1 | head -n 2 > {output.stats:q}"

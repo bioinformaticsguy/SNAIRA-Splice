@@ -241,6 +241,11 @@ document.querySelectorAll('table').forEach(table=>table.querySelectorAll('th .so
 </script></body></html>"""
 
 
+def is_masked_spliceai_mode(mode: str) -> bool:
+    """Return whether a known local SpliceAI execution mode used masking."""
+    return mode.strip().lower() == "local_masked"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidates", required=True, type=Path)
@@ -275,7 +280,7 @@ def main() -> int:
         "spliceai_version": args.spliceai_version_file.read_text(encoding="utf-8").strip(),
         "spliceai_mode": args.spliceai_mode,
         "spliceai_max_distance": args.spliceai_max_distance,
-        "spliceai_masked": args.spliceai_mode.endswith("masked"),
+        "spliceai_masked": is_masked_spliceai_mode(args.spliceai_mode),
         "spliceai_annotation": args.annotation,
         "spliceai_annotation_sha256": sha256(annotation_path),
         "reference_path": str(args.reference),

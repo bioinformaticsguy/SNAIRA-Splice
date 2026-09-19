@@ -6,7 +6,7 @@ from candidate_utils import (
     join_candidate_rows,
     retention_reasons,
 )
-from generate_report import build_report, summary_metrics
+from generate_report import build_report, is_masked_spliceai_mode, summary_metrics
 from parse_spliceai_vcf import parse_vcf
 from spliceai_utils import SpliceAIPrediction, parse_spliceai_entry, parse_spliceai_info
 
@@ -215,6 +215,11 @@ def test_html_generation_contains_controls_evidence_and_disclaimer() -> None:
     assert "DS AG / AL / DG / DL" in report
     assert "splice_acceptor_variant" in report
     assert "Provenance" in report
+
+
+def test_spliceai_masking_mode_does_not_misclassify_unmasked() -> None:
+    assert is_masked_spliceai_mode("local_masked")
+    assert not is_masked_spliceai_mode("local_unmasked")
 
 
 def test_summary_metrics_counts_missing_and_thresholds() -> None:
