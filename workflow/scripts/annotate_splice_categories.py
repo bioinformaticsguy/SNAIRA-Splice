@@ -67,7 +67,10 @@ def validate_gtf_assembly(gtf: Path, assembly: str) -> None:
         for line in handle:
             if not line.startswith("#"):
                 break
-            if line.startswith("#!genome-build"):
+            # Do not use a prefix match: Ensembl also writes
+            # ``#!genome-build-accession NCBI:GCA_000001405.29``. That accession
+            # identifies GRCh38.p14 but is not itself the configured GRCh38 label.
+            if line.startswith("#!genome-build "):
                 declared = line.split(maxsplit=1)[1].strip()
                 if not declared.startswith(assembly):
                     raise SystemExit(f"GTF genome build {declared!r} does not match configured assembly {assembly!r}")

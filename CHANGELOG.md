@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Correct GTF assembly validation so Ensembl's `genome-build-accession` header is not mistaken for the distinct `genome-build` value; release-115 GRCh38 GTFs now pass while true build mismatches still fail.
 - Print a compact controller status and high-signal error summary when collecting SLURM diagnostics, so common failures can be resolved without transferring the diagnostic bundle.
 - Parse SLURM's machine-readable accounting output for the on-screen summary, correctly handling unrecorded MaxRSS values.
 - Correct the forward-reference GRCh38 alleles for the PKHD1 and reverse-strand BRCA1 curated controls; add fixture consistency tests and document the genomic-versus-transcript allele convention.
