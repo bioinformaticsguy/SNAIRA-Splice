@@ -113,4 +113,46 @@ else
 fi
 
 find "$bundle" -maxdepth 1 -type f -printf '%f\n' | sort > "$bundle/contents.txt"
-echo "Diagnostic bundle created: $bundle"
+
+print_screen_summary() {
+  local -a log_tails=()
+  local matched_errors=""
+
+  shopt -s nullglob
+  log_tails=("$bundle"/log-*.tail.txt)
+  shopt -u nullglob
+
+  echo
+  echo "SNAIRA-Splice diagnostic summary"
+  echo "Controller job: $job_id"
+  echo "Controller status:"
+  awk -v job="$job_id" '
+    $1 == job { print "  " $1 "  state=" $3 "  exit=" $4 "  elapsed=" $5 "  max_rss=" $8 "  requested_memory=" $9; found=1; exit }
+    END { if (!found) print "  No controller row was returned by sacct." }
+  ' "$bundle/sacct.txt"
+
+  if [[ ${#log_tails[@]} -eq 0 ]]; then
+    echo "Relevant logs: none found under $repository/logs"
+    echo "Next action: wait briefly for SLURM accounting/log flush, then rerun this helper."
+  else
+    echo "Relevant log tails: ${#log_tails[@]} (stored in $bundle)"
+    matched_errors="$(
+      grep -HnE -i \
+        'reference allele mismatch|error in rule|slurm-job .* failed|workflowerror|traceback|exception|^error:|^error ' \
+        "${log_tails[@]}" 2>/dev/null | tail -n 20 || true
+    )"
+    if [[ -n "$matched_errors" ]]; then
+      echo "Most relevant error lines:"
+      while IFS= read -r line; do
+        echo "  $line"
+      done <<< "$matched_errors"
+    else
+      echo "No standard error signature was found in the retained tails."
+      echo "Inspect: $bundle/matching-log-files.txt"
+    fi
+  fi
+
+  echo "Diagnostic bundle created: $bundle"
+}
+
+print_screen_summary

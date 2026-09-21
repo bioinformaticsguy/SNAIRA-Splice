@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Print a compact controller status and high-signal error summary when collecting SLURM diagnostics, so common failures can be resolved without transferring the diagnostic bundle.
+- Correct the forward-reference GRCh38 alleles for the PKHD1 and reverse-strand BRCA1 curated controls; add fixture consistency tests and document the genomic-versus-transcript allele convention.
 - Add a versioned public GRCh38 curated-allele panel, preparation/submission/evaluation helpers, strict expected-versus-observed report, and unit tests for canonical, near-splice, deep-intronic, exonic-motif, and proximal-intronic-gap behaviour.
 - Add release-matched GTF-backed transcript-relative splice categories, including exact intronic junction distances, non-exclusive canonical/near/exonic-motif/deep-intronic assignments, an atomic assignment table, candidate/report category fields, and boundary tests.
 - Add explicit `--download-gtf` resource setup support for the Ensembl GTF pinned to the VEP/cache release.
