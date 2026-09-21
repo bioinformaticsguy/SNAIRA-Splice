@@ -11,6 +11,7 @@ resources/vep/
 resources/software/
 resources/resource_manifest.*
 logs/
+diagnostics/
 insp/
 scripts/slurm/submit_snaira_splice_controller.local.sh
 !resources/.gitkeep

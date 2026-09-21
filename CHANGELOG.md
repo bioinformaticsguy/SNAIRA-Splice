@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Ignore locally generated SLURM diagnostic bundles, which are review artifacts rather than reproducible project inputs.
 - Correct GTF assembly validation so Ensembl's `genome-build-accession` header is not mistaken for the distinct `genome-build` value; release-115 GRCh38 GTFs now pass while true build mismatches still fail.
 - Print a compact controller status and high-signal error summary when collecting SLURM diagnostics, so common failures can be resolved without transferring the diagnostic bundle.
 - Parse SLURM's machine-readable accounting output for the on-screen summary, correctly handling unrecorded MaxRSS values.
