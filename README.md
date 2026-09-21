@@ -53,11 +53,11 @@ Set `reference.*`, `vep.cache_directory`, `spliceai.annotation`, and `categories
 python scripts/run_snaira_splice.py \
   --vcf /absolute/path/sample.vcf.gz \
   --sample-id S001 \
-  --outdir results \
+  --outdir output/runs \
   --config config/config.yaml
 ```
 
-The final report is `results/S001/05_report/S001.snaira_splice.html`. Use `--dry-run` to inspect the DAG. Existing multi-sample manifest execution remains supported below.
+The final report is `output/runs/S001/05_report/S001.snaira_splice.html`. Use `--dry-run` to inspect the DAG. Existing multi-sample manifest execution remains supported below.
 
 For the current cluster, `config/cluster.yaml` contains the verified shared
 resource paths and the regional helper defaults to the prepared real sample.
@@ -74,8 +74,38 @@ Submit only after that passes:
 bash scripts/slurm/submit_region_test.sh --submit
 ```
 
-The smoke-test output root is `output/results/` inside the repository; for
-example, its report is `output/results/S001/05_report/S001.snaira_splice.html`.
+## Complete single-sample run
+
+The complete-WGS helper uses the same validated sample by default, never
+modifies its source VCF, and writes directly under `output/full-sample/`.
+Local unmasked SpliceAI with its 4,999-bp reporting window can take much longer
+than a regional test; the SLURM helper therefore requests up to 24 hours for
+VEP and 72 hours for SpliceAI. Prepare the generated configuration and inspect
+the DAG before submitting:
+
+```bash
+bash scripts/run_full_sample.sh --dry-run
+bash scripts/slurm/submit_full_sample.sh --preflight
+bash scripts/slurm/submit_full_sample.sh --submit
+```
+
+For a different source VCF, pass `--vcf /absolute/path/sample.vcf.gz` and
+`--sample-id SAMPLE_ID` to `run_full_sample.sh`, then pass the matching
+`--sample-id` to the submit helper. New output roots are intentionally simple:
+
+```text
+output/
+├── curated-evaluation/    # synthetic public-allele regression panel
+├── region-test/           # derived regional input and its workflow outputs
+├── full-sample/           # one complete sample: sample/, cohort/, metadata/
+└── runs/                  # ordinary manifest-driven workflow runs
+```
+
+Existing output directories are not moved automatically; they remain readable
+as historical run artifacts.
+
+The smoke-test output root is `output/region-test/` inside the repository; for
+example, its report is `output/region-test/S001/05_report/S001.snaira_splice.html`.
 Generated files beneath `output/` are git-ignored. Use the SLURM controller
 described below for cluster execution rather than `--run-local` on a login
 node. For another site or sample, override the VCF, sample ID, reference, and

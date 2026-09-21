@@ -2,6 +2,12 @@
 
 All paths are beneath configured `output_root`.
 
+For the checked-in helpers, new outputs use direct, purpose-specific roots:
+`output/curated-evaluation/`, `output/region-test/`, and
+`output/full-sample/`. Each run root directly contains its sample directories,
+`cohort/`, and `metadata/`; it does not add an otherwise redundant `results/`
+directory. Historical outputs are never moved by the workflow.
+
 - `metadata/resolved_samples.tsv`: resolved immutable inputs and manifest hashes.
 - `metadata/manifest_validation.json`: cohort validation errors/warnings.
 - `{sample}/logs/input_validation/`: BGZF, header, sample, and contig checks.

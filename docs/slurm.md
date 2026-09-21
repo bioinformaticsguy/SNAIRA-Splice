@@ -86,7 +86,7 @@ diagnostic bundle from the repository root:
 
 ```bash
 bash scripts/slurm/collect_job_diagnostics.sh 1234567 \
-  --configfile output/results/metadata/single_sample_input/S001/config.yaml
+  --configfile output/runs/metadata/single_sample_input/S001/config.yaml
 ```
 
 This creates `diagnostics/slurm-job-3326218/` with SLURM accounting, controller

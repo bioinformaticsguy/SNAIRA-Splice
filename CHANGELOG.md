@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Standardize newly created helper outputs under direct run roots rather than nested `output/results/`; add a one-command full-sample preparation/submission path with long VEP and SpliceAI runtime allocations.
 - Freeze `TSG-SPLICE-CATEGORIES/1.1.0`, adding Ensembl VEP 115's `splice_donor_5th_base_variant` as a near-splice term within the unchanged donor-side +3…+8 boundary; update the curated KLHL7 expectation accordingly.
 - Ignore locally generated SLURM diagnostic bundles, which are review artifacts rather than reproducible project inputs.
 - Correct GTF assembly validation so Ensembl's `genome-build-accession` header is not mistaken for the distinct `genome-build` value; release-115 GRCh38 GTFs now pass while true build mismatches still fail.

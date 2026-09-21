@@ -14,8 +14,8 @@ Override any input below to run another sample or site.
 
 Options:
   --config FILE           Workflow configuration (default: config/cluster.yaml)
-  --work-dir DIR          Derived input location (default: output/region-test-input/ID)
-  --outdir DIR            Pipeline result root (default: output/results)
+  --work-dir DIR          Derived input location (default: output/region-test)
+  --outdir DIR            Pipeline result root (default: output/region-test)
   --prepare-only          Create and validate the regional VCF (default)
   --dry-run               Also dry-run the complete pipeline DAG
   --run-local             Also execute locally; do not use on a login node
@@ -33,7 +33,7 @@ region="chr17:43000000-43200000"
 repository="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 site_config="$repository/config/cluster.yaml"
 work_root=""
-output_root="$repository/output/results"
+output_root="$repository/output/region-test"
 
 while (($#)); do
   case "$1" in
@@ -54,7 +54,7 @@ while (($#)); do
 done
 
 [[ "$sample_id" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "ERROR: unsafe sample ID: $sample_id" >&2; exit 2; }
-work_root="${work_root:-$repository/output/region-test-input/$sample_id}"
+work_root="${work_root:-$repository/output/region-test}"
 test_vcf="$work_root/input/$sample_id.region.vcf.gz"
 reference_dict="$work_root/reference/$(basename "${reference_fasta%.*}").dict"
 

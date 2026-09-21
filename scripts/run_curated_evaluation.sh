@@ -48,9 +48,14 @@ done
 source_vcf="$repository/tests/curated/curated_splice_variants.grch38.vcf"
 catalog="$repository/tests/curated/curated_splice_variants.tsv"
 input_vcf="$evaluation_root/input/$sample_id.vcf.gz"
-results_root="$evaluation_root/results"
+results_root="$evaluation_root"
+legacy_results_root="$evaluation_root/results"
 
 if [[ "$mode" == "evaluate" ]]; then
+  # Keep already completed runs readable after the output-layout simplification.
+  if [[ ! -d "$results_root/$sample_id" && -d "$legacy_results_root/$sample_id" ]]; then
+    results_root="$legacy_results_root"
+  fi
   python "$repository/workflow/scripts/evaluate_curated_variants.py" \
     --catalog "$catalog" \
     --assignments "$results_root/$sample_id/03_categories/$sample_id.splice_category.assignments.tsv.gz" \

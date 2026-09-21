@@ -105,7 +105,7 @@ while IFS=$'\t' read -r _timestamp log_path; do
 done < "$matching_logs"
 
 if [[ -z "$run_config" ]]; then
-  matches=(output/results/metadata/single_sample_input/*/config.yaml)
+  matches=(output/*/metadata/single_sample_input/*/config.yaml)
   [[ ${#matches[@]} -eq 1 && -s "${matches[0]}" ]] && run_config="${matches[0]}"
 fi
 if [[ -n "$run_config" && -s "$run_config" ]]; then

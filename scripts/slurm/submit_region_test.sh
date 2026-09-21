@@ -26,7 +26,11 @@ while (($#)); do
   esac
 done
 [[ -n "$sample_id" && -n "$mode" ]] || { usage >&2; exit 2; }
-config_file="${config_file:-$repository/output/results/metadata/single_sample_input/$sample_id/config.yaml}"
+config_file="${config_file:-$repository/output/region-test/metadata/single_sample_input/$sample_id/config.yaml}"
+legacy_config_file="$repository/output/results/metadata/single_sample_input/$sample_id/config.yaml"
+if [[ ! -s "$config_file" && -s "$legacy_config_file" ]]; then
+  config_file="$legacy_config_file"
+fi
 [[ -s "$config_file" ]] || { echo "ERROR: generated run configuration is missing: $config_file" >&2; exit 2; }
 
 export SNAIRA_MINIFORGE_PATH="${SNAIRA_MINIFORGE_PATH:-/work/hassan/hassan/miniforge}"

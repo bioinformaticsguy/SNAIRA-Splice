@@ -2,7 +2,7 @@ manifests:
   source: config/manifests.example.txt
   vcf_key: outputs.snv_pass_vcf
   index_key: outputs.snv_pass_vcf_index
-output_root: results
+output_root: output/runs
 reference:
   assembly: GRCh38
   fasta: resources/reference/GRCh38.fa

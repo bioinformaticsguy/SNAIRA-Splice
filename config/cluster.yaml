@@ -4,7 +4,7 @@ manifests:
   source: config/manifests.example.txt
   vcf_key: outputs.snv_pass_vcf
   index_key: outputs.snv_pass_vcf_index
-output_root: output/results
+output_root: output/runs
 reference:
   assembly: GRCh38
   fasta: /data/humangen_kircherlab/Users/hassan/repos/VariantPiper/assets/reference/hg38.fa

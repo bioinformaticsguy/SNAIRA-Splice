@@ -61,7 +61,7 @@ column -t -s $'\t' output/curated-evaluation/evaluation/curated_evaluation.tsv |
 The evaluation exits nonzero if an acceptance criterion fails and writes both `curated_evaluation.tsv` and `curated_evaluation.json` for review. The candidate report is at:
 
 ```text
-output/curated-evaluation/results/CURATED-SPLICE-1/05_report/CURATED-SPLICE-1.snaira_splice.html
+output/curated-evaluation/CURATED-SPLICE-1/05_report/CURATED-SPLICE-1.snaira_splice.html
 ```
 
 ## Scope limitations
