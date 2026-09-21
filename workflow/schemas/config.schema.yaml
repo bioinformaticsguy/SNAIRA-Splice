@@ -57,7 +57,7 @@ properties:
     properties:
       gtf: {type: string, minLength: 1}
       annotation_release: {type: integer, minimum: 1}
-      specification_version: {const: "1.0.0"}
+      specification_version: {const: "1.1.0"}
   outputs:
     type: object
     additionalProperties: false

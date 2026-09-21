@@ -31,7 +31,7 @@ spliceai:
 categories:
   gtf: tests/data/GRCh38.mini.gtf
   annotation_release: 115
-  specification_version: "1.0.0"
+  specification_version: "1.1.0"
 outputs: {vep_vcf: true, vep_tabular: true}
 temporary_directory: tests/work/tmp
 resources:

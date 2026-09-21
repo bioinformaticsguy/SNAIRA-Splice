@@ -1,11 +1,11 @@
-# The Splicing Gap splice-category specification v1.0
+# The Splicing Gap splice-category specification v1.1
 
 | Field | Value |
 |---|---|
 | Specification ID | `TSG-SPLICE-CATEGORIES` |
-| Version | `1.0.0` |
-| Status | Frozen for the SQ2 prototype |
-| Frozen on | 2026-08-10 |
+| Version | `1.1.0` |
+| Status | Frozen for the SQ2 prototype after VEP 115 terminology review |
+| Frozen on | 2026-09-21 |
 | Default assembly | GRCh38 |
 | Default annotation | Ensembl VEP 115.2/cache release 115, Ensembl transcripts |
 
@@ -58,7 +58,7 @@ upstream exon | donor | intron | acceptor | downstream exon
 
 Consequently, genomic left/right is not used to infer donor or acceptor type. On a reverse-strand transcript, the same transcript-relative rules apply after strand orientation.
 
-For substitutions, the affected reference interval is the substituted base. For deletions and delins, it is the normalized deleted/replaced reference interval after removal of the shared VCF anchor. For insertions, it is the interbase junction after removal of the shared anchor. A boundary-spanning allele overlaps every transcript region touched by that affected interval or junction. VEP consequence terms are authoritative for `canonical` and `near_splice` in v1.0 because VEP already applies these allele-aware rules.
+For substitutions, the affected reference interval is the substituted base. For deletions and delins, it is the normalized deleted/replaced reference interval after removal of the shared VCF anchor. For insertions, it is the interbase junction after removal of the shared anchor. A boundary-spanning allele overlaps every transcript region touched by that affected interval or junction. VEP consequence terms are authoritative for `canonical` and `near_splice` in v1.1 because VEP already applies these allele-aware rules.
 
 ### 3.3 Assembly awareness
 
@@ -98,7 +98,7 @@ Operationally these consequences normally cover the invariant intronic donor `+1
 
 An allele–transcript assignment is `near_splice` if and only if:
 
-1. its consequence set contains `splice_region_variant` (`SO:0001630`); and
+1. its consequence set contains either `splice_region_variant` (`SO:0001630`) or the Ensembl VEP 115 donor-specific term `splice_donor_5th_base_variant`; and
 2. the same transcript assignment contains neither `splice_donor_variant` nor `splice_acceptor_variant`.
 
 The Sequence Ontology boundary for `splice_region_variant` is within 1–3 bases of the exon or 3–8 bases of the intron. In transcript-relative terms, v1.0 therefore covers:
@@ -110,11 +110,11 @@ The Sequence Ontology boundary for `splice_region_variant` is within 1–3 bases
 
 These windows are inclusive. For an exon shorter than six bases, an exonic allele may lie within both its acceptor-side and donor-side windows; it remains one `near_splice` category assignment and MAY carry both boundary labels.
 
-This definition follows the published Sequence Ontology definition of [`splice_region_variant`](https://www.sequenceontology.org/miso/current_svn/term/SO%3A0001630). Extended donor, polypyrimidine-tract, and branchpoint regions are not silently added: Ensembl documents wider regions as distinct optional plugin consequences, including donor positions 3–6 and acceptor-side polypyrimidine positions 3–17 ([VEP plugin documentation](https://plants.ensembl.org/info/docs/tools/vep/script/vep_plugins.html)). A later specification may add explicit subcategories after tool selection.
+This definition follows the published Sequence Ontology definition of [`splice_region_variant`](https://www.sequenceontology.org/miso/current_svn/term/SO%3A0001630). VEP 115 additionally emits the more specific `splice_donor_5th_base_variant` for the donor-side `+5` position; v1.1 treats this as an equivalent near-splice consequence because it lies inside the unchanged `+3` through `+8` boundary. Extended donor, polypyrimidine-tract, and branchpoint regions are not silently added. A later specification may add explicit subcategories after tool selection.
 
-**Include:** VEP `splice_region_variant` rows satisfying the canonical exclusion above, including coding or UTR exonic rows with a combined consequence such as `missense_variant&splice_region_variant`.
+**Include:** VEP `splice_region_variant` rows and VEP 115 `splice_donor_5th_base_variant` rows satisfying the canonical exclusion above, including coding or UTR exonic rows with a combined consequence such as `missense_variant&splice_region_variant`.
 
-**Exclude:** canonical rows on the same transcript; intronic positions beyond 8 bases without a `splice_region_variant` term; variants annotated only by an unconfigured extended-region plugin.
+**Exclude:** canonical rows on the same transcript; intronic positions beyond 8 bases without an accepted near-splice term; variants annotated only by an unconfigured extended-region plugin.
 
 ### 4.3 Exonic splicing motif (`exonic_splicing_motif`)
 
@@ -141,7 +141,7 @@ An allele–transcript assignment is `deep_intronic` if and only if all of the f
 
 1. the entire affected reference interval, or the insertion junction, is inside an annotated intron of that transcript;
 2. its minimum distance to either bounding exon–intron junction is **greater than 100 bases** (at least 101 bases);
-3. its consequence set contains neither canonical splice term nor `splice_region_variant`; and
+3. its consequence set contains neither canonical splice term nor an accepted near-splice term; and
 4. it does not overlap an exon of that transcript.
 
 The threshold is inclusive on the excluded side: distance 100 is not deep; distance 101 is deep. The distance is computed independently for each transcript and intron using that transcript's strand-aware exon structure. An allele spanning or touching a boundary is not deep.
@@ -255,8 +255,8 @@ The prototype contract is:
 
 ```text
 contract_name: splicing_gap_viper_handoff
-contract_version: 1.0.0
-category_specification: TSG-SPLICE-CATEGORIES/1.0.0
+contract_version: 1.1.0
+category_specification: TSG-SPLICE-CATEGORIES/1.1.0
 ```
 
 Backward-incompatible field or semantic changes require a new major contract version. Additive optional fields require a minor version. The producer MUST fail on an unsupported requested major version.
@@ -296,7 +296,7 @@ Required fields:
 |---|---|---|
 | `contract_name` | string | Must equal `splicing_gap_viper_handoff`. |
 | `contract_version` | semver string | Contract used to serialize the bundle. |
-| `category_specification` | string | Must equal `TSG-SPLICE-CATEGORIES/1.0.0` for this version. |
+| `category_specification` | string | Must equal `TSG-SPLICE-CATEGORIES/1.1.0` for this version. |
 | `pipeline_version` | string | SNAIRA-Splice version or commit. |
 | `run_id` | string | Unique immutable run identifier. |
 | `created_at` | ISO-8601 string | UTC creation time. |
@@ -377,7 +377,7 @@ For each normalized allele and each configured transcript row:
 
 1. Parse the complete VEP consequence set.
 2. If donor and/or acceptor canonical terms are present, emit `canonical`; do not emit `near_splice` for that row.
-3. Otherwise, if `splice_region_variant` is present, emit `near_splice`.
+3. Otherwise, if `splice_region_variant` or `splice_donor_5th_base_variant` is present, emit `near_splice`.
 4. Independently, if the affected interval/junction overlaps a mature exon, emit `exonic_splicing_motif`.
 5. Otherwise, if it is wholly intronic and more than 100 bases from both boundaries, emit `deep_intronic`.
 6. If wholly intronic and 9–100 bases from the nearest boundary, retain it with the explicit `proximal_intronic_9_100` non-assignment reason.
@@ -389,7 +389,7 @@ For each normalized allele and each configured transcript row:
 | Transcript-relative example | Assignment(s) for that transcript | Notes |
 |---|---|---|
 | `c.100+1G>A`, VEP donor | `canonical:donor` | Canonical term is authoritative. |
-| `c.100+5G>A`, VEP splice region | `near_splice` | Donor-side intronic +3…+8. |
+| `c.100+5G>A`, VEP splice region or VEP 115 donor-fifth-base term | `near_splice` | Donor-side intronic +3…+8. |
 | Last exonic base, `missense_variant&splice_region_variant` | `near_splice`, `exonic_splicing_motif` | Coding term retained independently. |
 | Synonymous variant 40 bases from both exon edges | `exonic_splicing_motif` | Category does not claim motif disruption. |
 | Intronic variant 50 bases from nearest junction | no v1 category; `proximal_intronic_9_100` | Retained, not mislabeled as deep. |
@@ -398,17 +398,17 @@ For each normalized allele and each configured transcript row:
 
 ## 10. Versioning and change control
 
-This document is frozen as `1.0.0` for SQ2 prototype development. “Frozen” means implementations and tests may target it; it does not imply clinical validation.
+This document is frozen as `1.1.0` for SQ2 prototype development. “Frozen” means implementations and tests may target it; it does not imply clinical validation.
 
 Changes follow semantic versioning:
 
 - **patch:** wording or examples that do not alter classification;
-- **minor:** backward-compatible additive categories, fields, or optional subtypes;
+- **minor:** a compatible annotation-tool terminology mapping whose accepted coordinates remain within an existing category boundary;
 - **major:** changed boundaries, exclusions, precedence, transcript universe semantics, or required hand-off fields.
 
 Every change MUST update the document version and date, `CHANGELOG.md`, category fixtures, expected assignments, and hand-off validation tests. A future review SHOULD include clinical/splicing expertise before any clinical-facing release.
 
-## 11. v1.0 review checklist
+## 11. v1.1 review checklist
 
 - [x] Canonical definition is explicit and excludes region-only consequences.
 - [x] Near-splice exonic and intronic windows are inclusive and strand-independent through transcript orientation.
@@ -422,4 +422,4 @@ Every change MUST update the document version and date, `CHANGELOG.md`, category
 
 ## 12. Known implementation gap
 
-The current SNAIRA-Splice milestone implements canonical extraction and separately retains VEP `splice_region_variant` rows. It does not yet emit the complete v1.0 hand-off bundle, exon-overlap category rows, deep-intronic distances, or predictor evidence. This specification defines those next implementation targets without claiming that they have run.
+The current SNAIRA-Splice milestone emits transcript-aware category assignments and SpliceAI evidence, but does not yet emit the complete VIPER hand-off bundle or any additional named predictors. This specification defines those deferred targets without claiming that they have run.

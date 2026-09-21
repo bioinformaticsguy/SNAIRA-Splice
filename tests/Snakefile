@@ -67,7 +67,8 @@ rule annotate_categories:
         assignments="tests/work/e2e/category.assignments.tsv.gz"
     shell:
         "python3 workflow/scripts/annotate_splice_categories.py --input {input.transcripts} --gtf {input.gtf} "
-        "--output {output.transcripts} --assignments {output.assignments} --vep-release 115 --gtf-release 115 --assembly GRCh38"
+        "--output {output.transcripts} --assignments {output.assignments} --vep-release 115 --gtf-release 115 --assembly GRCh38 "
+        "--specification-version 1.1.0"
 
 rule candidates:
     input:
@@ -106,4 +107,4 @@ rule report:
         "--spliceai-mode local_unmasked --spliceai-max-distance 4999 --candidate-threshold 0.20 "
         "--review-threshold 0.05 --reference tests/data/GRCh38.mini.fa "
         "--annotation tests/data/spliceai.grch38.mock.txt --category-gtf tests/data/GRCh38.mini.gtf "
-        "--category-release 115 --category-specification 1.0.0 --config tests/config.test.yaml"
+        "--category-release 115 --category-specification 1.1.0 --config tests/config.test.yaml"

@@ -57,8 +57,10 @@ rule annotate_splice_categories:
     params:
         vep_release=config["vep"]["cache_version"],
         gtf_release=config["categories"]["annotation_release"],
-        assembly=config["reference"]["assembly"]
+        assembly=config["reference"]["assembly"],
+        specification_version=config["categories"]["specification_version"]
     shell:
         "python workflow/scripts/annotate_splice_categories.py --input {input.transcripts:q} --gtf {input.gtf:q} "
         "--output {output.transcripts:q} --assignments {output.assignments:q} --vep-release {params.vep_release} "
-        "--gtf-release {params.gtf_release} --assembly {params.assembly:q} > {log:q} 2>&1"
+        "--gtf-release {params.gtf_release} --assembly {params.assembly:q} "
+        "--specification-version {params.specification_version:q} > {log:q} 2>&1"

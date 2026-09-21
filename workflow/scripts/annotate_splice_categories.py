@@ -91,6 +91,7 @@ def main() -> int:
     parser.add_argument("--vep-release", required=True, type=int)
     parser.add_argument("--gtf-release", required=True, type=int)
     parser.add_argument("--assembly", required=True)
+    parser.add_argument("--specification-version", required=True)
     args = parser.parse_args()
     if args.vep_release != args.gtf_release:
         raise SystemExit(f"GTF release {args.gtf_release} does not match VEP release {args.vep_release}")
@@ -119,7 +120,7 @@ def main() -> int:
                     if field not in {"category", "category_specification", "gtf_path"}
                 },
                 "category": category,
-                "category_specification": "TSG-SPLICE-CATEGORIES/1.0.0",
+                "category_specification": f"TSG-SPLICE-CATEGORIES/{args.specification_version}",
                 "gtf_path": str(args.gtf),
             })
     atomic_tsv(args.output, rows, [*fields, *CATEGORY_FIELDS], gzip_output=True)

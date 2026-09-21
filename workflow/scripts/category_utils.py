@@ -1,10 +1,12 @@
-"""Transcript-aware splice-category utilities for TSG-SPLICE-CATEGORIES/1.0.0."""
+"""Transcript-aware splice-category utilities for TSG-SPLICE-CATEGORIES/1.1.0."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from splice_utils import canonical_splice_type, consequence_terms
+
+NEAR_SPLICE_VEP_TERMS = frozenset({"splice_region_variant", "splice_donor_5th_base_variant"})
 
 
 @dataclass(frozen=True)
@@ -97,7 +99,7 @@ def _overlaps_exon(model: TranscriptModel, interval: tuple[int, int] | None, ins
 def classify_transcript(
     *, consequence: str, feature_type: str, chrom: str, pos: int, ref: str, alt: str, model: TranscriptModel | None
 ) -> dict[str, str]:
-    """Classify one normalized allele × transcript under specification v1.0.0."""
+    """Classify one normalized allele × transcript under specification v1.1.0."""
     terms = consequence_terms(consequence)
     canonical_type = canonical_splice_type(consequence)
     categories: set[str] = set()
@@ -105,9 +107,10 @@ def classify_transcript(
     if canonical_type:
         categories.add("canonical")
         reasons.append(f"vep_canonical_{canonical_type}")
-    if "splice_region_variant" in terms and not canonical_type:
+    near_splice_terms = terms & NEAR_SPLICE_VEP_TERMS
+    if near_splice_terms and not canonical_type:
         categories.add("near_splice")
-        reasons.append("vep_splice_region_variant")
+        reasons.extend(f"vep_{term}" for term in sorted(near_splice_terms))
     if feature_type != "Transcript":
         return {
             "category_set": ";".join(sorted(categories)),
@@ -132,12 +135,12 @@ def classify_transcript(
     intron = _intron_context(model, interval, insertion_left)
     distance, junction_type = (intron if intron is not None else (None, ""))
     intronic_only = intron is not None and not _overlaps_exon(model, interval, insertion_left)
-    if intronic_only and not canonical_type and "splice_region_variant" not in terms:
+    if intronic_only and not canonical_type and not near_splice_terms:
         if distance is not None and distance > 100:
             categories.add("deep_intronic")
             reasons.append("gtf_intronic_distance_gt_100")
         elif distance is not None:
-            reason = "proximal_intronic_9_100" if distance >= 9 else "boundary_adjacent_without_vep_splice_region"
+            reason = "proximal_intronic_9_100" if distance >= 9 else "boundary_adjacent_without_vep_near_splice_term"
             reasons.append(reason)
     if categories:
         status = "assigned"

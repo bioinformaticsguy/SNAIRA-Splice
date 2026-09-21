@@ -23,6 +23,13 @@ def test_canonical_and_near_splice_follow_vep_terms() -> None:
     assert near["category_set"] == "near_splice"
 
 
+def test_vep_donor_fifth_base_term_is_near_splice() -> None:
+    result = classify(204, "splice_donor_5th_base_variant,intron_variant")
+    assert result["category_set"] == "near_splice"
+    assert result["nearest_junction_distance"] == "5"
+    assert result["category_assignment_reason"] == "vep_splice_donor_5th_base_variant"
+
+
 def test_exonic_motif_can_overlap_near_splice() -> None:
     result = classify(199, "splice_region_variant,missense_variant")
     assert result["category_set"] == "exonic_splicing_motif;near_splice"

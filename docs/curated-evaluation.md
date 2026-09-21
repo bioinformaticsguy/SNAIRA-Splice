@@ -13,7 +13,7 @@ The VCF and normalized identifiers use forward-reference genomic alleles. HGVS d
 | Case | GRCh38 allele | Expected pipeline observation | External provenance |
 |---|---|---|---|
 | `canonical_donor_brca1` | `chr17:43115724:A>T` | `BRCA1`, VEP `splice_donor_variant`, `canonical` | ClinVar Variation ID 867519; functional evidence is recorded by ClinVar. |
-| `near_splice_klhl7` | `chr7:23144030:G>C` | `KLHL7`, VEP `splice_region_variant`, `near_splice` | ClinVar Variation ID 452804; c.793+5 donor-side position. |
+| `near_splice_klhl7` | `chr7:23144030:G>C` | `KLHL7`, VEP 115 `splice_donor_5th_base_variant`, `near_splice` | ClinVar Variation ID 452804; c.793+5 donor-side position. |
 | `deep_intronic_cngb3` | `chr8:86605416:C>T` | `CNGB3`, VEP `intron_variant`, `deep_intronic`, distance ≥101 bp | ClinVar Variation ID 635822; RNA pseudoexon evidence includes PMID:31544997. |
 | `exonic_motif_pkhd1` | `chr6:51903693:G>A` | `PKHD1`, VEP `synonymous_variant`, `exonic_splicing_motif` | ClinVar Variation ID 558073; reported aberrant splicing includes PMID:28170084. |
 | `proximal_intronic_hbb` | `chr11:5226820:C>T` | `HBB`, VEP `intron_variant`, `outside_v1_categories`, distance 9–100 bp | ClinVar Variation ID 15454; intentional test of the frozen v1.0 gap. |
