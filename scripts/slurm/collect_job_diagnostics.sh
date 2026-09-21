@@ -66,6 +66,8 @@ write_command() {
 
 write_command sacct.txt sacct -j "$job_id" \
   --format=JobID,JobName%40,State,ExitCode,Elapsed,Start,End,MaxRSS,ReqMem,NodeList
+write_command sacct-machine.txt sacct -j "$job_id" --parsable2 --noheader \
+  --format=JobID,JobName,State,ExitCode,Elapsed,Start,End,MaxRSS,ReqMem,NodeList
 write_command scontrol-show-job.txt scontrol show job "$job_id"
 write_command git-revision.txt git rev-parse HEAD
 write_command git-status.txt git status --short
@@ -116,7 +118,18 @@ find "$bundle" -maxdepth 1 -type f -printf '%f\n' | sort > "$bundle/contents.txt
 
 print_screen_summary() {
   local -a log_tails=()
+  local controller_row=""
   local matched_errors=""
+  local recorded_job=""
+  local recorded_name=""
+  local recorded_state=""
+  local recorded_exit=""
+  local recorded_elapsed=""
+  local recorded_start=""
+  local recorded_end=""
+  local recorded_max_rss=""
+  local recorded_memory=""
+  local recorded_node=""
 
   shopt -s nullglob
   log_tails=("$bundle"/log-*.tail.txt)
@@ -126,10 +139,16 @@ print_screen_summary() {
   echo "SNAIRA-Splice diagnostic summary"
   echo "Controller job: $job_id"
   echo "Controller status:"
-  awk -v job="$job_id" '
-    $1 == job { print "  " $1 "  state=" $3 "  exit=" $4 "  elapsed=" $5 "  max_rss=" $8 "  requested_memory=" $9; found=1; exit }
-    END { if (!found) print "  No controller row was returned by sacct." }
-  ' "$bundle/sacct.txt"
+  controller_row="$(awk -F'|' -v job="$job_id" '$1 == job { print; exit }' "$bundle/sacct-machine.txt")"
+  if [[ -z "$controller_row" ]]; then
+    echo "  No controller row was returned by sacct."
+  else
+    IFS='|' read -r recorded_job recorded_name recorded_state recorded_exit \
+      recorded_elapsed recorded_start recorded_end recorded_max_rss recorded_memory recorded_node \
+      <<< "$controller_row"
+    echo "  $recorded_job  state=$recorded_state  exit=$recorded_exit  elapsed=$recorded_elapsed"
+    echo "  max_rss=${recorded_max_rss:-not_recorded}  requested_memory=${recorded_memory:-not_recorded}  node=${recorded_node:-not_recorded}"
+  fi
 
   if [[ ${#log_tails[@]} -eq 0 ]]; then
     echo "Relevant logs: none found under $repository/logs"
